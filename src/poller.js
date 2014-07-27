@@ -1,15 +1,21 @@
 'use strict';
 
-var domain = require('domain');
 var request = require('superagent');
 var superPromise = require('superagent-promises');
+var events = require('events');
+var util = require('util');
 
 var Poller = function(config) {
+
+    events.EventEmitter.call(this);
+
     this.url = config.url;
     this.refreshInterval = config.refreshInterval || 60000;
     this.parseData = config.parseData;
     this.poller = undefined;
 };
+
+util.inherits(Poller, events.EventEmitter);
 
 Poller.prototype.isRunning = function () {
     return !!this.poller;
@@ -35,7 +41,6 @@ Poller.prototype.start = function (opts) {
 
     var self = this;
     this.poller = setInterval(function () {
-        console.log('poller.js, fetching', self.url);
         self.fetch();
     }, this.refreshInterval);
 };
@@ -43,19 +48,17 @@ Poller.prototype.start = function (opts) {
 Poller.prototype.fetch = function () {
        
     var promisedData = function (url) { 
-
         return request
-            .get(url)
-            // .set('Accept', 'application/json')
-            .timeout(30000)
-            .use(superPromise)
-            .end()
-            .then(function (response) {
-                if (response.statusCode === 200) {
-                    console.log('poller.js, data promise has been resolved with response, ', response.text.replace(/([\n\r\t]|\s{2,})/g, '').substring(0, 50));
-                    return JSON.parse(response.text);
-                }
-            });
+                .get(url)
+                .set('Accept', 'application/json')
+                .timeout(30000)
+                .use(superPromise)
+                .end()
+                .then(function (response) {
+                    if (response.statusCode === 200) {
+                        return JSON.parse(response.text);
+                    } 
+                });
     };
 
     var self = this;
@@ -65,7 +68,7 @@ Poller.prototype.fetch = function () {
         .then(function (s) {
             self.parseData(s);
         }).catch(function (err) {
-            console.error('poller.js, error fetching', self.url, err);
+            self.emit('error', err)
         });
 };
 

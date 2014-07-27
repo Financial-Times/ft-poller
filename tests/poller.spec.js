@@ -5,6 +5,7 @@ var chai = require('chai');
 var Poller = require('../src/poller');
 var sinon = require('sinon'); 
 var nock = require('nock');
+var util = require('util');
 var expect = chai.expect;
 
 describe('Poller', function() {
@@ -74,16 +75,31 @@ describe('Poller', function() {
 
     });
  
-    it('Initial request', function() {
+    it('Should allow the first scheduled poll to happen immediately', function() {
         var poller = new Poller( { url: '/' } );
         var spy = sinon.spy(poller, 'fetch');
         poller.start( { initialRequest: true });
         expect(spy.callCount).to.equal(1);
     });
 
+    it('Should fire an event when a error is received from the server', function(done) {
+        
+        var ft = nock('http://example.com')
+            .get('/')
+            .reply(503, {});
 
-    xit('Gracefully handle errors', function() { }); // TODO remove domain code
-    xit('', function() { });
-    xit('', function() { });
- 
+        var p = new Poller({
+            url: 'http://example.com'
+        })
+
+        var eventEmitterStub = sinon.stub(p, 'emit');
+        p.fetch();
+
+        setTimeout(function () {
+            expect(eventEmitterStub.calledOnce).to.be.true;
+            expect(eventEmitterStub.getCall(0).args[0]).to.equal('error');
+            done();
+        }, 10);
+    
+    });
 })
