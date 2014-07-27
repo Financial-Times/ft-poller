@@ -102,4 +102,11 @@ describe('Poller', function() {
         }, 10);
     
     });
+
+    xit('Should stop polling for a given time after receiving three errors in succession');
+    xit('Should annotate the polling response with latency information');
+    xit('Should stop the job when it receives a "x-ft-poller-stop" header from the server');
+    xit('Should broadcast an event for each scheduled interval');
+
+
 })
