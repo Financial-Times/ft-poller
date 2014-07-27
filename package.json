@@ -23,12 +23,9 @@
     "chai": "^1.9.1",
     "mocha": "^1.21.0",
     "nock": "^0.42.2",
-    "debowerify": "~0.7.1",
     "jshint": "2.5.0",
-    "timer-shim": "^0.3.0"
-    "sinon": "^1.10.3",
-    "browserify": "^3.0.0",
-    "uglify-js": "^2.4.*"
+    "timer-shim": "^0.3.0",
+    "sinon": "^1.10.3"
   },
   "keywords": [
     "FT"
