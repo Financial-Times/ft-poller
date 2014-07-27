@@ -1,0 +1,46 @@
+{
+  "name": "ft-poller",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Financial-Times/ft-poller"
+  },
+  "license": "MIT",
+  "description": "A client to periodically fetch and cache data from web services",
+  "main": "./main.js",
+  "directories": {
+    "lib": "./lib"
+  },
+  "dependencies": {
+    "es6-promise": "^1.0.0",
+    "superagent": "https://github.com/Financial-Times/superagent/archive/bower.tar.gz",
+    "superagent-promises": "https://github.com/wheresrhys/superagent-promises/archive/master.tar.gz"
+  },
+  "peerDependencies": {
+    "es6-promise": "*"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "mocha": "^1.21.0",
+    "nock": "^0.42.2",
+    "debowerify": "~0.7.1",
+    "jshint": "2.5.0",
+    "timer-shim": "^0.3.0"
+    "sinon": "^1.10.3",
+    "browserify": "^3.0.0",
+    "uglify-js": "^2.4.*"
+  },
+  "keywords": [
+    "FT"
+  ],
+  "contributors": [
+    {
+      "name": "Matt Chadburn",
+      "email": "matt.chadburn@ft.com"
+    },
+    {
+      "name": "Rhys Evans",
+      "email": "rhys.evans@ft.com"
+    }
+  ]
+}

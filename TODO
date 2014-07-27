@@ -1,0 +1,17 @@
+
+- LRU.
+- Spread the interval logically across a time period so multiple URLs aren't
+  all fetched at the same time.
+- Circuit break the polling and send to sleep if something is broken.
+- Annotate requests with latency information
+- Promise based interface, Eg.
+- Respond to a X-Header to kill off the polling via the server
+
+    new Poller()
+        .get('example.com/foo')
+        .withInterval(2000)
+        .initialFetch(true)
+        .then(function (response) {
+            foo = response.text;
+        })
+
