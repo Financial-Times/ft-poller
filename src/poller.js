@@ -6,9 +6,6 @@ var events = require('events');
 var util = require('util');
 
 var Poller = function(config) {
-
-    //events.EventEmitter.call(this);
-
     this.url = config.url;
     this.refreshInterval = config.refreshInterval || 60000;
     this.parseData = config.parseData;
@@ -51,7 +48,7 @@ Poller.prototype.fetch = function () {
         return request
                 .get(url)
                 .set('Accept', 'application/json')
-                .timeout(30000)
+                .timeout(4000)
                 .use(superPromise)
                 .end()
                 .then(function (response) {
