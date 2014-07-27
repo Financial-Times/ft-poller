@@ -7,7 +7,7 @@ var util = require('util');
 
 var Poller = function(config) {
 
-    events.EventEmitter.call(this);
+    //events.EventEmitter.call(this);
 
     this.url = config.url;
     this.refreshInterval = config.refreshInterval || 60000;
