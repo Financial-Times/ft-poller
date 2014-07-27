@@ -9,7 +9,6 @@ var Poller = function(config) {
     this.refreshInterval = config.refreshInterval || 60000;
     this.parseData = config.parseData;
     this.poller = undefined;
-    this.name = config.name;
 };
 
 Poller.prototype.isRunning = function () {
@@ -27,8 +26,7 @@ Poller.prototype.start = function (opts) {
     var opts = opts || {}
  
     if (!!this.isRunning()) {
-        console.error('poller.js, could not start because the service is already running', this.url);
-        return false;
+        throw new Error('Could not start job because the service is already running');
     }
 
     if (opts.initialRequest) {
@@ -62,13 +60,13 @@ Poller.prototype.fetch = function () {
 
     var self = this;
       
-        // hydrate the data models 
-        promisedData(self.url) 
-            .then(function (s) {
-                self.parseData(s);
-            }).catch(function (err) {
-                console.error('poller.js, error fetching', self.url, err);
-            });
+    // hydrate the data models 
+    promisedData(self.url) 
+        .then(function (s) {
+            self.parseData(s);
+        }).catch(function (err) {
+            console.error('poller.js, error fetching', self.url, err);
+        });
 };
 
 module.exports = Poller;

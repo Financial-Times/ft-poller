@@ -18,6 +18,14 @@ describe('Poller', function() {
         poller.start();
         expect(poller.isRunning()).to.equal(true);
     });
+    
+    it('Should avoid starting a job twice', function() {
+        var poller = new Poller( { url: '/' } );
+        poller.start();
+        expect(function () {
+            poller.start()
+        }).to.throw('Could not start job because the service is already running');
+    });
 
     it('Should stop a job', function() {
         var poller = new Poller( { url: '/' } );
