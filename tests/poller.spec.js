@@ -102,9 +102,28 @@ describe('Poller', function() {
         }, 10);
     
     });
+    
+    it('Should annotate the polling response with latency information', function(done) {
+        
+        var ft = nock('http://example.com')
+            .get('/1')
+            .reply(200, { 'foo': 1 })
 
-    xit('Should stop polling for a given time after receiving three errors in succession');
-    xit('Should annotate the polling response with latency information');
+        var p = new Poller( { url: 'http://example.com/1', parseData: function () {} } );
+        
+        var eventEmitterStub = sinon.stub(p, 'emit');
+        p.fetch();
+        
+        setTimeout(function () {
+            expect(eventEmitterStub.calledOnce).to.be.true;
+            expect(eventEmitterStub.getCall(0).args[0]).to.equal('ok');
+            expect(eventEmitterStub.getCall(0).args[2]).to.match(/^\d+$/);
+            done();
+        }, 10);
+    });
+
+    xit('Should allow a maximum HTTP timeout of 4000ms');
+    xit('Should respond to receiving a Retry-After header');
     xit('Should stop the job when it receives a "x-ft-poller-stop" header from the server');
     xit('Should broadcast an event for each scheduled interval');
 

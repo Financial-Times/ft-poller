@@ -44,15 +44,18 @@ Poller.prototype.start = function (opts) {
 
 Poller.prototype.fetch = function () {
        
-    var promisedData = function (url) { 
-        return request
+    var time = new Date(),
+        promisedData = function (url) { 
+            return request
                 .get(url)
                 .set('Accept', 'application/json')
                 .timeout(4000)
                 .use(superPromise)
                 .end()
                 .then(function (response) {
+                    var latency = new Date() - time;
                     if (response.statusCode === 200) {
+                        self.emit('ok', response, latency)
                         return JSON.parse(response.text);
                     } 
                 });
@@ -65,6 +68,7 @@ Poller.prototype.fetch = function () {
         .then(function (s) {
             self.parseData(s);
         }).catch(function (err) {
+            //console.log(err);
             self.emit('error', err)
         });
 };
