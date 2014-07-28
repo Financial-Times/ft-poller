@@ -37,9 +37,9 @@ fetch the data it needs (or listen for a message to signal when new content is
 available), stash it in memory, then use that to service any incoming requests.
 
 This suits a [microservice
-architecture](http://microservices.io/articles/scalecube.html), where many
+architecture](http://martinfowler.com/articles/microservices.html), where many
 discrete modules, APIs etc. need to be assembled by a presentation tier before
-being rendered out to the client. 
+being rendered out to the client (as HTML, JSON etc.). 
 
 ### Usage
 
