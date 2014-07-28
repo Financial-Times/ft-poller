@@ -6,7 +6,8 @@ fetched independently from the server.
 
 Install the dependencies then fire up the server and client,
     
-    npm install express node server.js & node client.js
+    npm install express
+    node server.js & node client.js
 
 ## About
 
