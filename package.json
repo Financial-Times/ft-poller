@@ -6,7 +6,7 @@
     "url": "https://github.com/Financial-Times/ft-poller"
   },
   "license": "MIT",
-  "description": "A client to periodically fetch and cache data from web services",
+  "description": "An http client to periodically fetch and cache data from web services",
   "main": "./main.js",
   "directories": {
     "lib": "./lib"
@@ -28,7 +28,10 @@
     "sinon": "^1.10.3"
   },
   "keywords": [
-    "FT"
+    "FT",
+    "job scheduler",
+    "microservices",
+    "async"
   ],
   "contributors": [
     {

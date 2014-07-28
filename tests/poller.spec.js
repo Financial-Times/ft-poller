@@ -1,12 +1,12 @@
 
 GLOBAL.Promise = require('es6-promise').Promise;
 
-var chai = require('chai');
-var Poller = require('../src/poller');
-var sinon = require('sinon'); 
-var nock = require('nock');
-var util = require('util');
-var expect = chai.expect;
+var chai = require('chai'),
+    Poller = require('../src/poller'),
+    sinon = require('sinon'), 
+    nock = require('nock'),
+    util = require('util'),
+    expect = chai.expect;
 
 describe('Poller', function() {
 
@@ -24,7 +24,7 @@ describe('Poller', function() {
         var poller = new Poller( { url: '/' } );
         poller.start();
         expect(function () {
-            poller.start()
+            poller.start();
         }).to.throw('Could not start job because the service is already running');
     });
 

@@ -26,7 +26,7 @@ Poller.prototype.stop = function() {
 
 Poller.prototype.start = function (opts) {
    
-    var opts = opts || {}
+    var opts = opts || {};
  
     if (!!this.isRunning()) {
         throw new Error('Could not start job because the service is already running');
@@ -55,7 +55,7 @@ Poller.prototype.fetch = function () {
                 .then(function (response) {
                     var latency = new Date() - time;
                     if (response.statusCode === 200) {
-                        self.emit('ok', response, latency)
+                        self.emit('ok', response, latency);
                         return JSON.parse(response.text);
                     } 
                 });
@@ -68,8 +68,7 @@ Poller.prototype.fetch = function () {
         .then(function (s) {
             self.parseData(s);
         }).catch(function (err) {
-            //console.log(err);
-            self.emit('error', err)
+            self.emit('error', err);
         });
 };
 
