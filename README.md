@@ -49,16 +49,23 @@ Install it,
 
 You can create an instance of Poller like so,
 
+    // Nb. do `npm install es6-promise` if running node < 10.x 
+    GLOBAL.Promise = require('es6-promise').Promise;
+
     var Poller = require('ft-poller'),
         response;
 
     var p = new Poller({
-        url: 'http://www.example.com/foo' 
+        url: 'http://www.example.com/foo', 
         refreshInterval: 2000,
         parseData: function (data) {
             response = data;
         }
     });
+
+    p.on('error', function (err) {
+        console.error(err)
+    })
 
 This will fire a request every 2s to example.com/foo and cache the result
 in _response_. 
