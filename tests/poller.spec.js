@@ -124,8 +124,5 @@ describe('Poller', function() {
 
     xit('Should allow a maximum HTTP timeout of 4000ms');
     xit('Should respond to receiving a Retry-After header');
-    xit('Should stop the job when it receives a "x-ft-poller-stop" header from the server');
-    xit('Should broadcast an event for each scheduled interval');
-
 
 })
