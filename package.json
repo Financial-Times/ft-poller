@@ -7,7 +7,7 @@
   },
   "license": "MIT",
   "description": "An http client to periodically fetch and cache data from web services",
-  "main": "./src/poller.js",
+  "main": "./src/server.js",
   "directories": {
     "lib": "./lib"
   },

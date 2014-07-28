@@ -2,7 +2,7 @@
 GLOBAL.Promise = require('es6-promise').Promise;
 
 var chai = require('chai'),
-    Poller = require('../src/poller'),
+    Poller = require('../src/server'),
     sinon = require('sinon'), 
     nock = require('nock'),
     util = require('util'),
@@ -41,14 +41,18 @@ describe('Poller', function() {
             .get('/')
             .reply(200, { 'foo': 1 });
 
-        new Poller( {
+        var p = new Poller( {
                 url: 'http://example.com',
                 parseData: function (res) {
                     expect(ft.isDone()).to.be.true // ensure Nock has been used
                     expect(res.foo).to.equal(1) 
                     done();
                 } 
-        }).fetch();
+        })
+        
+        p.on('error', function(e) { console.log(e); });
+
+        p.fetch();
     });
 
     it('Should check the poller interval runs correctly', function(done) {
