@@ -49,8 +49,6 @@ describe('Poller', function() {
                     done();
                 } 
         })
-        
-        p.on('error', function(e) { console.log(e); });
 
         p.fetch();
     });
