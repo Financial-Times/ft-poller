@@ -86,7 +86,7 @@ Sometimes you don't want to wait the _refreshInterval_ to have your data
 populated, so passing _initialRequest: true_ will fire the first request as
 soon as the object is created, and then afterwards, at every refresh interval. 
 
-    p.start({ initialRefresh: true });
+    p.start({ initialRequest: true });
 
 ### Events
 
