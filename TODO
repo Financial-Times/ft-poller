@@ -6,6 +6,7 @@
 - Annotate requests with latency information
 - Promise based interface, Eg.
 - Respond to a X-Header to kill off the polling via the server
+- Allow users to inject superagent headers, timeout etc.
 
     new Poller()
         .get('example.com/foo')
