@@ -3,9 +3,9 @@ Scheduled, async content fetching for Node.js applications.
 
 ### Background
 
-The classic request cycle for a web application follows a request from a client
+The classic request cycle for a web application follows a call from a client
 to the server, which in turn makes one or more further requests to some
-underlying service. 
+underlying service(s). 
 
                                     +---> Web service 1 --> Data 
                                     |       
@@ -13,7 +13,7 @@ underlying service.
                                     |   
                                     +---> Web service 3 --> Data
 
-Once the data has been fished out, the response makes it's way back through the
+Once the data has been retrieved the response makes it's way back through the
 various layers to the client. 
 
 This causes two problems.
@@ -34,7 +34,12 @@ change radically from second to second so this round trip is wasted effort.
 
 It's much more efficient for each presentation tier server to periodically
 fetch the data it needs (or listen for a message to signal when new content is
-available), stash it in memory then use that to service any incoming requests.
+available), stash it in memory, then use that to service any incoming requests.
+
+This suits a [microservice
+architecture](http://microservices.io/articles/scalecube.html), where many
+discrete modules, APIs etc. need to be assembled by a presentation tier before
+being rendered out to the client. 
 
 ### Usage
 
@@ -66,9 +71,34 @@ And stop it like this,
 
     p.stop()
 
-Sometimes you don't want to wait the refreshInterval to have your data
+Sometimes you don't want to wait the _refreshInterval_ to have your data
 populated, so passing _initialRequest: true_ will fire the first request as
 soon as the object is created, and then afterwards, at every refresh interval. 
 
     p.start({ initialRefresh: true });
+
+### Events
+
+Given the asynchronous nature of this library, events might provide a simple
+interface to attach other async code to.
+
+#### Ok
+
+This fires each time the polling mechanism has successfully received a repsonse
+from it's source. Eg, 
+
+    var p = new Poller({ url: 'http://example.com/123' })
+
+    p.on('ok', function (response, latency) {
+        // ... 
+    })
+
+#### Error
+
+This fires each time the polling mechanism fails, passing the error as an
+argument. Eg, 
+
+    p.on('error', function (response) {
+        // ... 
+    })
 
