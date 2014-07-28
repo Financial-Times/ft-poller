@@ -1,5 +1,5 @@
 
-Scheduled, async content fetching for Node.js applications.
+Scheduled, asynchronous JSON fetching for Node.js applications.
 
 ### Background
 
@@ -19,12 +19,12 @@ various layers to the client.
 This causes two problems.
 
 Firstly, your response is dependent on the slowest service to respond. If every
-request is hanging around waiting for 'the slow one' you are going only ever
-going to perform at the slowest speed.
+request is hanging around waiting for 'the slow one' your performance is pegged
+to the worst performing part of your application.
 
 Secondly, by far the slowest thing in this type of architecture is the
-roundtrip between the presentation tier and the service(s). The more of these
-you have hanging around, waiting for connections to close, the greater the
+round-trip between the presentation tier and the service(s). The more of these
+open connections you have hanging around, waiting to close, the greater the
 burden you place on your server.
 
 #### Async
@@ -40,6 +40,10 @@ This suits a [microservice
 architecture](http://martinfowler.com/articles/microservices.html), where many
 discrete modules, APIs etc. need to be assembled by a presentation tier before
 being rendered out to the client (as HTML, JSON etc.). 
+
+This pattern (of asynchronous fetching) allows the presentation tier to focus on
+building a response from existing data (in memory) and sending it back out the
+front door as quickly as possible.
 
 ### Usage
 
