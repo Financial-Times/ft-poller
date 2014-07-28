@@ -9,4 +9,4 @@ Object.getOwnPropertyNames(EventEmitter.prototype).forEach(function (fn) {
     Poller.prototype[fn] = e[fn];
 })
 
-module.exports = require('./poller'); 
+module.exports = Poller;
