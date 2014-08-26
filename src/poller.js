@@ -2,8 +2,6 @@
 
 var request = require('superagent');
 var superPromise = require('superagent-promises');
-var events = require('events');
-var util = require('util');
 
 var Poller = function(config) {
     this.url = config.url;
@@ -11,8 +9,6 @@ var Poller = function(config) {
     this.parseData = config.parseData;
     this.poller = undefined;
 };
-
-util.inherits(Poller, events.EventEmitter);
 
 Poller.prototype.isRunning = function () {
     return !!this.poller;
