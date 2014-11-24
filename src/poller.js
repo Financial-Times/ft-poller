@@ -1,10 +1,25 @@
 'use strict';
 
-var request = require('superagent');
-var superPromise = require('superagent-promises');
+require('es6-promise').polyfill();
+
+var request = require('request');
 
 var Poller = function(config) {
-    this.url = config.url;
+    if (!config.options && !config.url) {
+        throw 'ft-poller expects either a url or an options object compatible with request';
+    }
+    this.options = config.options || {
+        url: config.url
+    };
+
+    this.options.timeout = this.options.timeout || 4000;
+
+    this.options.headers = this.options.headers || {};
+
+    if (!this.options.headers.Accept) {
+        this.options.headers['Accept'] = 'application/json';
+    }
+
     this.refreshInterval = config.refreshInterval || 60000;
     this.parseData = config.parseData;
     this.poller = undefined;
@@ -22,7 +37,7 @@ Poller.prototype.stop = function() {
 
 Poller.prototype.start = function (opts) {
    
-    var opts = opts || {};
+    opts = opts || {};
  
     if (!!this.isRunning()) {
         throw new Error('Could not start job because the service is already running');
@@ -39,33 +54,31 @@ Poller.prototype.start = function (opts) {
 };
 
 Poller.prototype.fetch = function () {
-       
-    var time = new Date(),
-        promisedData = function (url) { 
-            return request
-                .get(url)
-                .set('Accept', 'application/json')
-                .timeout(4000)
-                .use(superPromise)
-                .end()
-                .then(function (response) {
-                    var latency = new Date() - time;
-                    if (response.statusCode === 200) {
-                        self.emit('ok', response, latency);
-                        return JSON.parse(response.text);
-                    } 
-                });
-    };
-
+    
+    var time = new Date();
     var self = this;
-      
-    // hydrate the data models 
-    promisedData(self.url) 
-        .then(function (s) {
-            self.parseData(s);
-        }).catch(function (err) {
-            self.emit('error', err);
+    
+    new Promise(function (resolve, reject) {
+        request(self.options, function (error, response, body) {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(response);
+            }
         });
+    }).then(function (response) {
+        var latency = new Date() - time;
+        if (response.statusCode === 200) {
+            self.emit('ok', response, latency);
+            return JSON.parse(response.body);
+        } else {
+            throw response.body;
+        }
+    }).then(function (s) {
+        self.parseData(s);
+    }).catch(function (err) {
+        self.emit('error', err);
+    });
 };
 
 module.exports = Poller;
