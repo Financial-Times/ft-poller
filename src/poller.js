@@ -70,7 +70,7 @@ Poller.prototype.fetch = function () {
         var latency = new Date() - time;
         if (response.statusCode === 200) {
             self.emit('ok', response, latency);
-            return JSON.parse(response.body);
+            return self.options.json ? response.body : JSON.parse(response.body);
         } else {
             throw response.body;
         }
