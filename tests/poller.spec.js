@@ -1,4 +1,3 @@
-
 GLOBAL.Promise = require('es6-promise').Promise;
 
 var chai = require('chai'),
@@ -112,6 +111,28 @@ describe('Poller', function() {
             .reply(200, { 'foo': 1 })
 
         var p = new Poller( { url: 'http://example.com/1', parseData: function () {} } );
+        
+        var eventEmitterStub = sinon.stub(p, 'emit');
+        p.fetch();
+        
+        setTimeout(function () {
+            expect(eventEmitterStub.calledOnce).to.be.true;
+            expect(eventEmitterStub.getCall(0).args[0]).to.equal('ok');
+            expect(eventEmitterStub.getCall(0).args[2]).to.match(/^\d+$/);
+            done();
+        }, 10);
+    });
+
+    it('Should handle POST requests', function(done) {
+        
+        var ft = nock('http://example.com')
+            .post('/1')
+            .reply(200, { 'foo': 1 })
+
+        var p = new Poller( { options: {
+            url: 'http://example.com/1',
+            method: 'POST'
+        }, parseData: function () {} } );
         
         var eventEmitterStub = sinon.stub(p, 'emit');
         p.fetch();

@@ -88,6 +88,10 @@ soon as the object is created, and then afterwards, at every refresh interval.
 
     p.start({ initialRequest: true });
 
+Under the hood ft-poller uses [`request`](https://www.npmjs.org/package/request) 
+so you can specify an `options` property instead of `url`, which will be passed
+straight to `request`. This allows using e.g `POST` instead of `GET`.
+
 ### Events
 
 Given the asynchronous nature of this library, events might provide a simple

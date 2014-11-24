@@ -13,8 +13,7 @@
   },
   "dependencies": {
     "es6-promise": "^1.0.0",
-    "superagent": "https://github.com/Financial-Times/superagent/archive/bower.tar.gz",
-    "superagent-promises": "https://github.com/wheresrhys/superagent-promises/archive/master.tar.gz"
+    "request": "^2.48.0"
   },
   "peerDependencies": {
     "es6-promise": "*"
