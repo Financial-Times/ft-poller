@@ -60,6 +60,7 @@ You can create an instance of Poller like so,
         response;
 
     var p = new Poller({
+        // url can also be a request config object https://github.com/request/request#requestoptions-callback
         url: 'http://www.example.com/foo', 
         refreshInterval: 2000,
         parseData: function (data) {
