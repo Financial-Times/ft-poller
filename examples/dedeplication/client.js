@@ -1,12 +1,13 @@
+'use strict';
 
 GLOBAL.Promise = require('es6-promise').Promise;
 
-var Poller = require('../../src/poller'),
-    response = { },
-    host = 'localhost:3000'
-    opts = { initialRequest: true };
+var Poller = require('../../src/poller');
+var response = { };
+var host = 'localhost:3000';
+var opts = { initialRequest: true };
 
-// Generate three lists of numbers at different intervals 
+// Generate three lists of numbers at different intervals
 
 new Poller({ url: host + '/1', refreshInterval: 5000, parseData: function (data) { response.one   = data.hello; } }).start(opts);
 new Poller({ url: host + '/1', refreshInterval: 1000, parseData: function (data) { response.two   = data.hello; } }).start(opts);
@@ -17,22 +18,22 @@ new Poller({ url: host + '/1', refreshInterval: 8000, parseData: function (data)
 
 setInterval(function () {
 
-    if (Object.keys(response).length === 0) {
-        return false; 
-    }
-    
-    var headlines = Object
-        .keys(response)
-        .map(function (key) { // cast the responses to arrays
-            return response[key]
-        })
-        .reduce(function (a, b) { // flatten the array
-            return a.concat(b);
-        })
-        .filter(function (el, i, arr) { // de-duplicate
-            return arr.indexOf(el) === i;
-        })
+	if (Object.keys(response).length === 0) {
+		return false;
+	}
 
-    console.log(headlines.sort())
+	var headlines = Object
+		.keys(response)
+		.map(function (key) { // cast the responses to arrays
+			return response[key];
+		})
+		.reduce(function (a, b) { // flatten the array
+			return a.concat(b);
+		})
+		.filter(function (el, i, arr) { // de-duplicate
+			return arr.indexOf(el) === i;
+		});
 
-}, 1000)
+	console.log(headlines.sort());
+
+}, 1000);

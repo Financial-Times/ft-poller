@@ -1,5 +1,6 @@
 
-test: 
+test:
+	next-build-tools verify
 	./node_modules/.bin/mocha tests/poller.spec.js
 
 publish:
