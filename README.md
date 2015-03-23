@@ -60,8 +60,8 @@ You can create an instance of Poller like so,
         response;
 
     var p = new Poller({
-        // instead of url can also pass an 'options' property compatible with request https://github.com/request/request#requestoptions-callback
         url: 'http://www.example.com/foo', 
+        options {}, //optional object compatible with isomorphic-fetch
         refreshInterval: 2000,
         parseData: function (data) {
             response = data;
