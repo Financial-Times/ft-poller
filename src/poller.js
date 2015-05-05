@@ -18,6 +18,7 @@ var Poller = function(config) {
 	this.options.headers = this.options.headers || {};
 
 	if (!this.options.headers.Accept) {
+		this.options.headers['Content-Type'] = 'application/json';
 		this.options.headers['Accept'] = 'application/json';
 	}
 
