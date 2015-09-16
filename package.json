@@ -12,17 +12,17 @@
     "lib": "./lib"
   },
   "dependencies": {
-    "es6-promise": "^2.0.0",
-    "fetchres": "^1.1.0",
-    "isomorphic-fetch": "^2.0.0"
+    "es6-promise": "^3.0.2",
+    "fetchres": "^1.4.1",
+    "isomorphic-fetch": "^2.1.1"
   },
   "devDependencies": {
-    "chai": "^1.9.1",
-    "jshint": "2.5.0",
-    "mocha": "^1.21.0",
-    "next-build-tools": "^1.17.7",
-    "nock": "^0.42.2",
-    "sinon": "^1.10.3",
+    "chai": "^3.2.0",
+    "jshint": "2.8.0",
+    "mocha": "^2.3.2",
+    "next-build-tools": "^3.27.2",
+    "nock": "^2.11.0",
+    "sinon": "^1.16.1",
     "timer-shim": "^0.3.0"
   },
   "keywords": [
