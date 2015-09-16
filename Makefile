@@ -1,6 +1,6 @@
 
 test:
-	next-build-tools verify
+	next-build-tools verify --skip-layout-checks
 	./node_modules/.bin/mocha tests/poller.spec.js
 
 publish:
