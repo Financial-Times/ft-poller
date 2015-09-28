@@ -52,6 +52,24 @@ describe('Poller', function() {
 		p.fetch();
 	});
 
+	it('Should pass a text object to the given callback', function(done) {
+
+		var ft = nock('http://example.com')
+			.get('/')
+			.reply(200, 'hello world');
+
+		var p = new Poller( {
+				url: 'http://example.com',
+				parseData: function (res) {
+					expect(ft.isDone()).to.be.true; // ensure Nock has been used
+					expect(res).to.equal('hello world');
+					done();
+				}
+		});
+
+		p.fetch();
+	});
+
 	it('Should check the poller interval runs correctly', function(done) {
 
 		var ft = nock('http://example.com')

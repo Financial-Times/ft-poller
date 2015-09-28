@@ -3,8 +3,6 @@
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
 
-var fetchres = require('fetchres');
-
 var Poller = function(config) {
 	if (!config.url) {
 		throw 'ft-poller expects a url';
