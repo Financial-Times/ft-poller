@@ -3,8 +3,6 @@
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
 
-var fetchres = require('fetchres');
-
 var Poller = function(config) {
 	if (!config.url) {
 		throw 'ft-poller expects a url';
@@ -68,10 +66,13 @@ Poller.prototype.fetch = function () {
 			} else {
 				throw response.body;
 			}
-			return response;
+			if (response.headers.get('content-type') === 'application/json') {
+				return response.json();
+			} else {
+				return response.text();
+			}
 		})
-		.then(fetchres.json)
-		.then(function (s) {
+		.then(function(s) {
 			self.parseData(s);
 		})
 		.catch(function (err) {
