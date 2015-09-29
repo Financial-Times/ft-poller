@@ -66,7 +66,7 @@ Poller.prototype.fetch = function () {
 			} else {
 				throw response.body;
 			}
-			if (response.headers.get('content-type') === 'application/json') {
+			if ((response.headers.get('content-type') || '').indexOf('application/json') > -1) {
 				return response.json();
 			} else {
 				return response.text();
