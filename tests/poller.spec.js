@@ -34,14 +34,32 @@ describe('Poller', function() {
 		expect(poller.isRunning()).to.equal(false);
 	});
 
+	it('Regression test: Should pass a JSON object to the given callback when the Content-Type contains but does not equal application/json (e.g. bertha)', function(done) {
+
+		var ft = nock('http://example.com')
+			.get('/json-charset')
+			.reply(200, { 'foo': 1 }, { 'Content-Type': 'application/json; charset=utf-8' });
+
+		var p = new Poller( {
+				url: 'http://example.com/json-charset',
+				parseData: function (res) {
+					expect(ft.isDone()).to.be.true; // ensure Nock has been used
+					expect(res.foo).to.equal(1);
+					done();
+				}
+		});
+
+		p.fetch();
+	});
+
 	it('Should pass a JSON object to the given callback', function(done) {
 
 		var ft = nock('http://example.com')
-			.get('/')
+			.get('/json')
 			.reply(200, { 'foo': 1 });
 
 		var p = new Poller( {
-				url: 'http://example.com',
+				url: 'http://example.com/json',
 				parseData: function (res) {
 					expect(ft.isDone()).to.be.true; // ensure Nock has been used
 					expect(res.foo).to.equal(1);
