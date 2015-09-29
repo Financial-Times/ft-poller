@@ -4,8 +4,9 @@ var express = require('express');
 var app = express();
 
 var getRandomIntegers = function () {
-		var min = 1, max = 9;
-		return [1, 2, 3].map(function () {
+		var min = 1;
+		var max = 9;
+		return [1, 2, 3].map(function() {
 				return Math.floor(Math.random() * (max - min + 1)) + min;
 		});
 };
