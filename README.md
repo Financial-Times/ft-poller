@@ -53,9 +53,6 @@ Install it,
 
 You can create an instance of Poller like so,
 
-    // Nb. do `npm install es6-promise` if running node < 11.x 
-    GLOBAL.Promise = require('es6-promise').Promise;
-
     var Poller = require('ft-poller'),
         response;
 

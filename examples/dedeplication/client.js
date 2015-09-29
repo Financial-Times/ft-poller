@@ -1,7 +1,5 @@
 'use strict';
 
-GLOBAL.Promise = require('es6-promise').Promise;
-
 var Poller = require('../../src/poller');
 var response = { };
 var host = 'localhost:3000';
@@ -9,8 +7,8 @@ var opts = { initialRequest: true };
 
 // Generate three lists of numbers at different intervals
 
-new Poller({ url: host + '/1', refreshInterval: 5000, parseData: function (data) { response.one   = data.hello; } }).start(opts);
-new Poller({ url: host + '/1', refreshInterval: 1000, parseData: function (data) { response.two   = data.hello; } }).start(opts);
+new Poller({ url: host + '/1', refreshInterval: 5000, parseData: function (data) { response.one = data.hello; } }).start(opts);
+new Poller({ url: host + '/1', refreshInterval: 1000, parseData: function (data) { response.two = data.hello; } }).start(opts);
 new Poller({ url: host + '/1', refreshInterval: 8000, parseData: function (data) { response.three = data.hello; } }).start(opts);
 
 // Imagine this was part of the rendering of the application, where we want to
