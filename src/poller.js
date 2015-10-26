@@ -74,7 +74,6 @@ Poller.prototype.fetch = function () {
 			}
 		})
 		.then(function(s) {
-			console.log('in promise then')
 			self.parseData(s);
 		})
 		.catch(function (err) {
