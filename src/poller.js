@@ -38,26 +38,28 @@ Poller.prototype.stop = function() {
 
 Poller.prototype.start = function (opts) {
 	opts = opts || {};
-
+	let initialPromise;
 	if (!!this.isRunning()) {
 		throw new Error('Could not start job because the service is already running');
 	}
 
 	if (opts.initialRequest) {
-		this.fetch();
+		initialPromise = this.fetch();
 	}
 
 	var self = this;
 	this.poller = setInterval(function () {
 		self.fetch();
 	}, this.refreshInterval);
+
+	return opts.initialRequest ? initialPromise : Promise.resolve();
 };
 
 Poller.prototype.fetch = function () {
 
 	var time = new Date();
 	var self = this;
-	fetch(this.url, this.options)
+	return fetch(this.url, this.options)
 		.then(function (response) {
 			var latency = new Date() - time;
 			if (response.status === 200) {
@@ -72,6 +74,7 @@ Poller.prototype.fetch = function () {
 			}
 		})
 		.then(function(s) {
+			console.log('in promise then')
 			self.parseData(s);
 		})
 		.catch(function (err) {
