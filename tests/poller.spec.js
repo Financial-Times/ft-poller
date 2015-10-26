@@ -119,6 +119,32 @@ describe('Poller', function() {
 		expect(spy.callCount).to.equal(1);
 	});
 
+	it('Should return a promise which resolves when initial fetch happens', function(done) {
+		var poller = new Poller( { url: '/' } );
+		var spy = sinon.spy(poller, 'fetch');
+
+		var eventEmitterStub = sinon.stub(poller, 'emit');
+
+		poller.start( { initialRequest: true }).then(function() {
+			expect(eventEmitterStub.calledOnce).to.be.true;
+			done();
+		});
+		expect(spy.callCount).to.equal(1);
+	});
+
+	it('Should resolve start with a promise immediately when not doing an initial fetch', function(done) {
+		var poller = new Poller( { url: '/' } );
+		var spy = sinon.spy(poller, 'fetch');
+
+		var eventEmitterStub = sinon.stub(poller, 'emit');
+
+		poller.start().then(function() {
+			expect(eventEmitterStub.calledOnce).to.be.false;
+			done();
+		});
+		expect(spy.callCount).to.equal(0);
+	});
+
 	it('Should fire an event when a error is received from the server', function(done) {
 
 		var ft = nock('http://example.com')
