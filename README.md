@@ -13,7 +13,7 @@ underlying service(s).
                                     |   
                                     +---> Web service 3 --> Data
 
-Once the data has been retrieved the response makes it's way back through the
+Once the data has been retrieved the response makes its way back through the
 various layers to the client. 
 
 This causes two problems.
