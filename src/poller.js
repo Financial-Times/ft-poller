@@ -65,7 +65,7 @@ Poller.prototype.fetch = function () {
 			if (response.status === 200) {
 				self.emit('ok', response, latency);
 			} else {
-				throw response.body;
+				throw new Error(response.status + ' ' + response.statusText);
 			}
 			if ((response.headers.get('content-type') || '').indexOf('json') > -1) {
 				return response.json();
