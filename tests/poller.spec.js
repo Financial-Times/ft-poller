@@ -213,6 +213,28 @@ describe('Poller', function() {
 		}, 10);
 	});
 
+	it('Should be possible to retry requests', function () {
+		sinon.stub(Poller.prototype, 'eagerFetch', function () {
+			return Promise.reject({
+				message: 'network timeout at 12345'
+			});
+		});
+		var p = new Poller({
+			url: 'http://example.com/1',
+			options: {
+				method: 'POST',
+				retry: 2,
+			},
+			parseData: function () {}
+		});
+
+
+		p.fetch();
+		expect(p.eagerFetch.calledOnce).to.be.true;
+		Poller.prototype.eagerFetch.restore();
+
+	});
+
 	xit('Should allow a maximum HTTP timeout of 4000ms');
 	xit('Should respond to receiving a Retry-After header');
 

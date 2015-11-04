@@ -14,6 +14,10 @@ var Poller = function(config) {
 
 	this.options.headers = this.options.headers || {};
 
+	this._fetch = this.options.retry ? this.eagerFetch : fetch;
+
+	console.log(this._fetch.toString())
+
 	if (!this.options.headers['Content-Type']) {
 		this.options.headers['Content-Type'] = 'application/json';
 	}
@@ -59,7 +63,7 @@ Poller.prototype.fetch = function () {
 
 	var time = new Date();
 	var self = this;
-	return fetch(this.url, this.options)
+	return this._fetch(this.url, this.options)
 		.then(function (response) {
 			var latency = new Date() - time;
 			if (response.status === 200) {

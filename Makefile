@@ -4,7 +4,7 @@ clean:
 install:
 	npm install
 
-test: verify unit-test
+test: unit-test verify
 
 unit-test:
 	mocha tests/poller.spec.js

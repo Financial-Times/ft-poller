@@ -1,6 +1,7 @@
 'use strict';
 
 var Poller = require('./poller');
+Poller.prototype.eagerFetch = require('n-eager-fetch');
 var EventEmitter = require('events').EventEmitter;
 
 var e = new EventEmitter();
