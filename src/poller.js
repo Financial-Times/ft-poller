@@ -16,8 +16,6 @@ var Poller = function(config) {
 
 	this._fetch = this.options.retry ? this.eagerFetch : fetch;
 
-	console.log(this._fetch.toString())
-
 	if (!this.options.headers['Content-Type']) {
 		this.options.headers['Content-Type'] = 'application/json';
 	}
