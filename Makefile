@@ -11,6 +11,3 @@ unit-test:
 
 verify:
 	nbt verify --skip-layout-checks
-
-publish:
-	@git push origin master && git push origin master --tags
