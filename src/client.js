@@ -2,7 +2,8 @@
 'use strict';
 
 var Poller = require('./poller');
-
+// eager fetch not yet supported on client side
+Poller.prototype.eagerFetch = fetch;
 var el = document.body;
 
 Poller.prototype.emit = function (eventName, data) {
