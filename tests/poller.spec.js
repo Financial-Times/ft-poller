@@ -235,6 +235,47 @@ describe('Poller', function() {
 
 	});
 
+	it('Should be possible to act as data container', function(done) {
+
+		nock('http://example.com')
+			.get('/json')
+			.reply(200, { 'foo': 1 });
+
+		var p = new Poller( {
+				url: 'http://example.com/json',
+				defaultData: 0,
+				parseData: function (res) {
+					return res.foo;
+				}
+		});
+
+		expect(p.getData()).to.equal(0)
+
+		p.fetch();
+		setTimeout(function () {
+			expect(p.getData()).to.equal(1);
+			done();
+		}, 10);
+	});
+
+	it('Should define a default data parser', function(done) {
+
+		nock('http://example.com')
+			.get('/json')
+			.reply(200, { 'foo': 1 });
+
+		var p = new Poller( {
+				url: 'http://example.com/json',
+				defaultData: {}
+		});
+
+		p.fetch();
+		setTimeout(function () {
+			expect(p.getData()).to.deep.equal({foo: 1});
+			done();
+		}, 10);
+	});
+
 	xit('Should allow a maximum HTTP timeout of 4000ms');
 	xit('Should respond to receiving a Retry-After header');
 

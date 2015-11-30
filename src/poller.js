@@ -9,7 +9,7 @@ var Poller = function(config) {
 
 	this.url = config.url;
 	this.options = config.options || {};
-
+	this.data = config.defaultData;
 	this.options.timeout = this.options.timeout || 4000;
 
 	this.options.headers = this.options.headers || {};
@@ -24,7 +24,9 @@ var Poller = function(config) {
 	}
 
 	this.refreshInterval = config.refreshInterval || 60000;
-	this.parseData = config.parseData;
+	this.parseData = config.parseData || function (data) {
+		return data;
+	};
 	this.poller = undefined;
 };
 
@@ -76,11 +78,15 @@ Poller.prototype.fetch = function () {
 			}
 		})
 		.then(function(s) {
-			self.parseData(s);
+			self.data = self.parseData(s);
 		})
 		.catch(function (err) {
 			self.emit('error', err);
 		});
 };
+
+Poller.prototype.getData = function () {
+	return this.data;
+}
 
 module.exports = Poller;

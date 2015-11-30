@@ -1,20 +1,62 @@
 
-Scheduled, asynchronous JSON fetching for Node.js applications.
+Scheduled, asynchronous JSON fetching for Node.js applications. [Background](#background);
+
+### installation
+
+```
+npm install ft-poller
+```
+
+### API
+You can create an instance of Poller like so,
+
+```
+var Poller = require('ft-poller');
+var p = new Poller(config);
+```
+
+Where `config` is an object with the following properties
+
+* `url` [required]: Url to fetch data from
+* `defaultData` [recommended]: Data to return if the poller is yet to make a successful request. Typically this will be an empty object of the same type/structure as a successful response e.g. if a successful response woudl give you an array of users then et `defaultData: []`
+* `options` [optional]: options object to pass to isomorphic-fetch. If optiosn is not defined or doesn't contain a `timeout` property, request timeout will be set to 4000ms by default. If `retry` is specified then n-eager-fetch is used to send the request instead of fetch
+* `refreshInterval` [default: 60000]: Number of milliseconds to wait between request for data
+* `autostart` [default: false]: Whether to start the poller automatically when the instance is created
+* `parseData` [optional]: function to post-process the data returned by the request. Should return the post-processed data e.g
+```
+parseData: function (data) {
+    return data.rows;
+}
+```
+
+#### methods
+
+* `start()` - Starts the poller. If passed an object `{ initialRequest: true }` it will send its first request immediately, otherwise it will wait until `config.refreshInterval` milliseconds. Returns a promise for the result of the first request (if `initialRequest` is true), or an empty resolved Promise otherwise
+
+* `stop()` - Stops polling
+
+* `getData()` - Returns the last set of data retrieved from the server (post-processed if `parseData` function exists)
+
+#### Events
+
+* `error` - emits an error whenever a request returns with an error
+* `ok` - emits the response whenever a request returns successfully
+
 
 ### Background
 
 The classic request cycle for a web application follows a call from a client
 to the server, which in turn makes one or more further requests to some
-underlying service(s). 
+underlying service(s).
 
-                                    +---> Web service 1 --> Data 
-                                    |       
+                                    +---> Web service 1 --> Data
+                                    |
     Client ---> Presentation tier --|---> Web service 2 --> Data
-                                    |   
+                                    |
                                     +---> Web service 3 --> Data
 
 Once the data has been retrieved the response makes its way back through the
-various layers to the client. 
+various layers to the client.
 
 This causes two problems.
 
@@ -30,7 +72,7 @@ burden you place on your server.
 #### Async
 
 Often though, and this is especially true of News sites, the data doesn't
-change radically from second to second so this round trip is wasted effort. 
+change radically from second to second so this round trip is wasted effort.
 
 It's much more efficient for each presentation tier server to periodically
 fetch the data it needs (or listen for a message to signal when new content is
@@ -39,79 +81,8 @@ available), stash it in memory, then use that to service any incoming requests.
 This suits a [microservice
 architecture](http://martinfowler.com/articles/microservices.html), where many
 discrete modules, APIs etc. need to be assembled by a presentation tier before
-being rendered out to the client (as HTML, JSON etc.). 
+being rendered out to the client (as HTML, JSON etc.).
 
 This pattern (of asynchronous fetching) allows the presentation tier to focus on
 building a response from existing data (in memory) and sending it back out the
 front door as quickly as possible.
-
-### Usage
-
-Install it,
-
-    npm install ft-poller
-
-You can create an instance of Poller like so,
-
-    var Poller = require('ft-poller'),
-        response;
-
-    var p = new Poller({
-        url: 'http://www.example.com/foo', 
-        options {}, //optional object compatible with isomorphic-fetch
-        refreshInterval: 2000,
-        parseData: function (data) {
-            response = data;
-        }
-    });
-
-    p.on('error', function (err) {
-        console.error(err)
-    })
-
-This will fire a request every 2s to example.com/foo and cache the result
-in _response_. 
-
-You can start polling like so,
-
-    p.start()
-    
-And stop it like this,
-
-    p.stop()
-
-Sometimes you don't want to wait the _refreshInterval_ to have your data
-populated, so passing _initialRequest: true_ will fire the first request as
-soon as the object is created, and then afterwards, at every refresh interval. 
-
-    p.start({ initialRequest: true });
-
-Under the hood ft-poller uses [`request`](https://www.npmjs.org/package/request) 
-so you can specify an `options` property instead of `url`, which will be passed
-straight to `request`. This allows using e.g `POST` instead of `GET`.
-
-### Events
-
-Given the asynchronous nature of this library, events might provide a simple
-interface to attach other async code to.
-
-#### Ok
-
-This fires each time the polling mechanism has successfully received a repsonse
-from it's source. Eg, 
-
-    var p = new Poller({ url: 'http://example.com/123' })
-
-    p.on('ok', function (response, latency) {
-        // ... 
-    })
-
-#### Error
-
-This fires each time the polling mechanism fails, passing the error as an
-argument. Eg, 
-
-    p.on('error', function (response) {
-        // ... 
-    })
-
