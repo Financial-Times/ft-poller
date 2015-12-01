@@ -28,6 +28,9 @@ var Poller = function(config) {
 		return data;
 	};
 	this.poller = undefined;
+	if (config.autostart) {
+		this.start({initialRequest: true})
+	}
 };
 
 Poller.prototype.isRunning = function () {

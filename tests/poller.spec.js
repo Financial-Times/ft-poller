@@ -276,6 +276,24 @@ describe('Poller', function() {
 		}, 10);
 	});
 
+	it('Should be possible to autostart', function() {
+
+		nock('http://example.com')
+			.get('/json')
+			.reply(200, { 'foo': 1 });
+
+		sinon.stub(Poller.prototype, 'start');
+
+		var p = new Poller( {
+				url: 'http://example.com/json',
+				defaultData: {},
+				autostart: true
+		});
+
+		expect(p.start.calledOnce).to.be.true;
+		expect(p.start.args[0][0]).to.deep.equal({initialRequest: true})
+	});
+
 	xit('Should allow a maximum HTTP timeout of 4000ms');
 	xit('Should respond to receiving a Retry-After header');
 
