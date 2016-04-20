@@ -1,11 +1,18 @@
 'use strict';
 
+var EventEmitter = require('events').EventEmitter;
 require('isomorphic-fetch');
 
 var Poller = function(config) {
 	if (!config.url) {
 		throw 'ft-poller expects a url';
 	}
+	var e = new EventEmitter();
+	var self = this;
+
+	Object.getOwnPropertyNames(EventEmitter.prototype).forEach(function (fn) {
+		self[fn] = e[fn];
+	});
 
 	this.url = config.url;
 	this.options = config.options || {};
