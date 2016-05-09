@@ -17,8 +17,9 @@
   },
   "devDependencies": {
     "chai": "^3.3.0",
+    "eslint": "^2.9.0",
+    "lintspaces-cli": "^0.1.1",
     "mocha": "^2.3.3",
-    "next-build-tools": "^5.1.0",
     "nock": "^2.13.0",
     "sinon": "^1.10.3",
     "timer-shim": "^0.3.0"
