@@ -63,7 +63,6 @@ Poller.prototype.start = function (opts) {
 };
 
 Poller.prototype.retry = function(){
-	console.log('retry');
 	this.fetch();
 	clearInterval(this.poller);
 	this.poller = setInterval(function () {
