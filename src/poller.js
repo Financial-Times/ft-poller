@@ -62,8 +62,16 @@ Poller.prototype.start = function (opts) {
 	return opts.initialRequest ? initialPromise : Promise.resolve();
 };
 
-Poller.prototype.fetch = function () {
+Poller.prototype.retry = function(){
+	console.log('retry');
+	this.fetch();
+	clearInterval(this.poller);
+	this.poller = setInterval(function () {
+		self.fetch();
+	}, this.refreshInterval);
+};
 
+Poller.prototype.fetch = function () {
 	var time = new Date();
 	var self = this;
 	return this._fetch(this.url, this.options)
@@ -82,6 +90,7 @@ Poller.prototype.fetch = function () {
 		})
 		.then(function(s) {
 			self.data = self.parseData(s);
+			self.emit('data', self.data);
 		})
 		.catch(function (err) {
 			self.emit('error', err);
