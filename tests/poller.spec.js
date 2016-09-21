@@ -180,7 +180,7 @@ describe('Poller', function() {
 
 		setTimeout(function () {
 			expect(ft.isDone()).to.be.true; // ensure Nock has been used
-			expect(eventEmitterStub.calledOnce).to.be.true;
+			expect(eventEmitterStub.called).to.be.true;
 			expect(eventEmitterStub.getCall(0).args[0]).to.equal('ok');
 			expect(eventEmitterStub.getCall(0).args[2]).to.match(/^\d+$/);
 			done();
@@ -206,7 +206,7 @@ describe('Poller', function() {
 
 		setTimeout(function () {
 			expect(ft.isDone()).to.be.true; // ensure Nock has been used
-			expect(eventEmitterStub.calledOnce).to.be.true;
+			expect(eventEmitterStub.called).to.be.true;
 			expect(eventEmitterStub.getCall(0).args[0]).to.equal('ok');
 			expect(eventEmitterStub.getCall(0).args[2]).to.match(/^\d+$/);
 			done();
@@ -282,7 +282,7 @@ describe('Poller', function() {
 			.get('/json')
 			.reply(200, { 'foo': 1 });
 
-		sinon.stub(Poller.prototype, 'start');
+		const stub = sinon.stub(Poller.prototype, 'start');
 
 		var p = new Poller( {
 				url: 'http://example.com/json',
@@ -291,10 +291,61 @@ describe('Poller', function() {
 		});
 
 		expect(p.start.calledOnce).to.be.true;
-		expect(p.start.args[0][0]).to.deep.equal({initialRequest: true})
+		expect(p.start.args[0][0]).to.deep.equal({initialRequest: true});
+		stub.restore();
 	});
 
 	xit('Should allow a maximum HTTP timeout of 4000ms');
 	xit('Should respond to receiving a Retry-After header');
+
+	it('Should fire a "data" event when new data is received and parsed', (done) => {
+		const stub = { 'foo': 1 };
+		nock('http://example.com')
+			.get('/json')
+			.reply(200, stub);
+
+		var p = new Poller( {
+			url: 'http://example.com/json',
+			defaultData: 0
+		});
+
+		p.start({initialRequest:true});
+		p.once('data', data => {
+			expect(data).to.deep.equal(stub);
+			done();
+		})
+	});
+
+	it('Should have the ability to manually retry', done => {
+		const stub1 = { 'foo': 1 };
+		nock('http://example.com')
+			.get('/json')
+			.reply(200, stub1)
+
+		var p = new Poller( {
+			url: 'http://example.com/json',
+			defaultData: 0
+		});
+
+		const onSecond = data => {
+			try{
+				console.log('onSecond', data);
+				expect(data).to.deep.equal(stub1);
+				done();
+			}catch(e){
+				done(e);
+			}
+
+		};
+
+		const onFirst = () => {
+			p.once('data', onSecond);
+			p.retry();
+		};
+
+		p.once('data', onFirst);
+
+		p.start({initialRequest:true});
+	})
 
 });
