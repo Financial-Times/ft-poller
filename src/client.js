@@ -1,17 +1,23 @@
 /*global CustomElement */
 'use strict';
+class EventEmitter {
 
-var Poller = require('./poller');
+	constructor(){
+		this.el = document.body;
+	}
+
+	emit(eventName, data){
+		this.el.dispatchEvent(new CustomElement(eventName, { detail: data }));
+	}
+
+	on(eventName, fn){
+		this.el.addEventListener(eventName, fn, true);
+	}
+}
+
+const Poller = require('./poller')(EventEmitter);
+
 // eager fetch not yet supported on client side
 Poller.prototype.eagerFetch = fetch;
-var el = document.body;
-
-Poller.prototype.emit = function (eventName, data) {
-		el.dispatchEvent(new CustomElement(eventName, { detail: data }));
-};
-
-Poller.prototype.on = function (eventName, fn) {
-		el.addEventListener(eventName, fn, true);
-};
 
 module.exports = Poller;

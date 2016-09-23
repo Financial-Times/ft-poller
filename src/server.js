@@ -1,10 +1,7 @@
 'use strict';
-const util = require('util');
+const EventEmitter = require('events').EventEmitter;
+const Poller = require('./poller')(EventEmitter);
 
-var Poller = require('./poller');
 Poller.prototype.eagerFetch = require('n-eager-fetch');
-var EventEmitter = require('events').EventEmitter;
-
-util.inherits(Poller, EventEmitter);
 
 module.exports = Poller;
