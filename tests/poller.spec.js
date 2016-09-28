@@ -329,7 +329,6 @@ describe('Poller', function() {
 
 		const onSecond = data => {
 			try{
-				console.log('onSecond', data);
 				expect(data).to.deep.equal(stub1);
 				done();
 			}catch(e){
