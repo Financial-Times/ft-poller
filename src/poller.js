@@ -21,7 +21,7 @@ module.exports = EventEmitter => {
 
 			this._fetch = this.options.retry ? this.eagerFetch : fetch;
 
-			if (!this.options.headers['Content-Type']) {
+			if (!this.options.headers['Content-Type'] && this.options.method === 'POST') {
 				this.options.headers['Content-Type'] = 'application/json';
 			}
 			if (!this.options.headers.Accept) {
