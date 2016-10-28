@@ -9,7 +9,7 @@ module.exports = EventEmitter => {
 		constructor(config){
 			super();
 			if (!config.url) {
-				throw 'ft-poller expects a url';
+				throw new Error('ft-poller expects a url');
 			}
 
 			this.url = config.url;
@@ -82,7 +82,7 @@ module.exports = EventEmitter => {
 					if (response.status === 200) {
 						this.emit('ok', response, latency);
 					} else {
-						throw `Fetching ${response.url} failed with a ${response.status}, ${response.statusText}`;
+						throw new Error(`Fetching ${response.url} failed with a ${response.status}, ${response.statusText}`);
 					}
 					if ((response.headers.get('content-type') || '').indexOf('json') > -1) {
 						return response.json();
