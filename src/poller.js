@@ -1,6 +1,6 @@
 'use strict';
-require('isomorphic-fetch');
 
+require('isomorphic-fetch');
 
 module.exports = EventEmitter => {
 
@@ -18,8 +18,6 @@ module.exports = EventEmitter => {
 			this.options.timeout = this.options.timeout || 4000;
 
 			this.options.headers = this.options.headers || {};
-
-			this._fetch = this.options.retry ? this.eagerFetch : fetch;
 
 			if (!this.options.headers['Content-Type'] && this.options.method === 'POST') {
 				this.options.headers['Content-Type'] = 'application/json';
@@ -76,7 +74,9 @@ module.exports = EventEmitter => {
 
 		fetch(){
 			const time = new Date();
-			return this._fetch(this.url, this.options)
+			const _fetch = this.options.retry ? this.eagerFetch : fetch;
+
+			return _fetch(this.url, this.options)
 				.then( (response) => {
 					const latency = new Date() - time;
 					if (response.status === 200) {
