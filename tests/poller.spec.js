@@ -1,199 +1,198 @@
 /* global it, describe, xit */
-'use strict';
 
-var chai = require('chai');
-var Poller = require('../src/server');
-var sinon = require('sinon');
-var nock = require('nock');
-var expect = chai.expect;
+const chai = require ('chai');
+const Poller = require ('../src/server');
+const sinon = require ('sinon');
+const nock = require ('nock');
+const expect = chai.expect;
 
-describe('Poller', function() {
+describe ('Poller', function () {
 
-	it('Should exist', function() {
-		expect(new Poller( { url: '/' } )).to.be.defined;
+	it ('Should exist', function () {
+		expect (new Poller( { url: '/' } )).to.be.defined;
 	});
 
-	it('Should start a job', function() {
-		var poller = new Poller( { url: '/' } );
-		poller.start();
-		expect(poller.isRunning()).to.equal(true);
+	it ('Should start a job', function () {
+		const poller = new Poller( { url: '/' } );
+		poller.start ();
+		expect (poller.isRunning ()).to.equal (true);
 	});
 
-	it('Should avoid starting a job twice', function() {
-		var poller = new Poller( { url: '/' } );
-		poller.start();
-		expect(function () {
-			poller.start();
-		}).to.throw('Could not start job because the service is already running');
+	it ('Should avoid starting a job twice', function () {
+		const poller = new Poller( { url: '/' } );
+		poller.start ();
+		expect (function () {
+			poller.start ();
+		}).to.throw ('Could not start job because the service is already running');
 	});
 
-	it('Should stop a job', function() {
-		var poller = new Poller( { url: '/' } );
-		poller.start();
-		poller.stop();
-		expect(poller.isRunning()).to.equal(false);
+	it ('Should stop a job', function () {
+		const poller = new Poller( { url: '/' } );
+		poller.start ();
+		poller.stop ();
+		expect (poller.isRunning ()).to.equal (false);
 	});
 
-	it('Regression test: Should pass a JSON object to the given callback when the Content-Type contains but does not equal application/json (e.g. bertha)', function(done) {
+	it ('Regression test: Should pass a JSON object to the given callback when the Content-Type contains but does not equal application/json (e.g. bertha)', function (done) {
 
-		var ft = nock('http://example.com')
-			.get('/json-charset')
-			.reply(200, { 'foo': 1 }, { 'Content-Type': 'application/json; charset=utf-8' });
+		const ft = nock ('http://example.com')
+			.get ('/json-charset')
+			.reply (200, { 'foo': 1 }, { 'Content-Type': 'application/json; charset=utf-8' });
 
-		var p = new Poller( {
+		const p = new Poller( {
 				url: 'http://example.com/json-charset',
 				parseData: function (res) {
-					expect(ft.isDone()).to.be.true; // ensure Nock has been used
-					expect(res.foo).to.equal(1);
-					done();
+					expect (ft.isDone ()).to.be.true; // ensure Nock has been used
+					expect (res.foo).to.equal (1);
+					done ();
 				}
 		});
 
-		p.fetch();
+		p.fetch ();
 	});
 
-	it('Should pass a JSON object to the given callback', function(done) {
+	it ('Should pass a JSON object to the given callback', function (done) {
 
-		var ft = nock('http://example.com')
-			.get('/json')
-			.reply(200, { 'foo': 1 });
+		const ft = nock ('http://example.com')
+			.get ('/json')
+			.reply (200, { 'foo': 1 });
 
-		var p = new Poller( {
+		const p = new Poller( {
 				url: 'http://example.com/json',
 				parseData: function (res) {
-					expect(ft.isDone()).to.be.true; // ensure Nock has been used
-					expect(res.foo).to.equal(1);
-					done();
+					expect (ft.isDone ()).to.be.true; // ensure Nock has been used
+					expect (res.foo).to.equal (1);
+					done ();
 				}
 		});
 
-		p.fetch();
+		p.fetch ();
 	});
 
-	it('Should pass a text object to the given callback', function(done) {
+	it ('Should pass a text object to the given callback', function (done) {
 
-		var ft = nock('http://example.com')
-			.get('/')
-			.reply(200, 'hello world');
+		const ft = nock ('http://example.com')
+			.get ('/')
+			.reply (200, 'hello world');
 
-		var p = new Poller( {
+		const p = new Poller( {
 				url: 'http://example.com',
 				parseData: function (res) {
-					expect(ft.isDone()).to.be.true; // ensure Nock has been used
-					expect(res).to.equal('hello world');
-					done();
+					expect (ft.isDone ()).to.be.true; // ensure Nock has been used
+					expect (res).to.equal ('hello world');
+					done ();
 				}
 		});
 
-		p.fetch();
+		p.fetch ();
 	});
 
-	it('Should check the poller interval runs correctly', function(done) {
+	it ('Should check the poller interval runs correctly', function (done) {
 
-		var ft = nock('http://example.com')
-			.get('/')
-			.reply(200, { 'foo': 1 });
+		const ft = nock ('http://example.com')
+			.get ('/')
+			.reply (200, { 'foo': 1 });
 
-		var clock = sinon.useFakeTimers();
+		const clock = sinon.useFakeTimers ();
 
-		var poller = new Poller({
+		const poller = new Poller({
 				url: 'http://example.com',
 				refreshInterval: 5000,
 				parseData: function (res) {
-					expect(res.foo).to.equal(1);
-					expect(ft.isDone()).to.be.true; // ensure Nock has been used
-					done();
+					expect (res.foo).to.equal (1);
+					expect (ft.isDone ()).to.be.true; // ensure Nock has been used
+					done ();
 				}
 			});
 
-		poller.start();
-		clock.tick(6000);  // fast-forward 6 seconds
-		clock.restore();
+		poller.start ();
+		clock.tick (6000);  // fast-forward 6 seconds
+		clock.restore ();
 
 	});
 
-	it('Should allow the first scheduled poll to happen immediately', function() {
-		var poller = new Poller( { url: '/' } );
-		var spy = sinon.spy(poller, 'fetch');
-		poller.start( { initialRequest: true });
-		expect(spy.callCount).to.equal(1);
+	it ('Should allow the first scheduled poll to happen immediately', function () {
+		const poller = new Poller( { url: '/' } );
+		const spy = sinon.spy (poller, 'fetch');
+		poller.start ({ initialRequest: true });
+		expect (spy.callCount).to.equal (1);
 	});
 
-	it('Should return a promise which resolves when initial fetch happens', function(done) {
-		var poller = new Poller( { url: '/' } );
-		var spy = sinon.spy(poller, 'fetch');
+	it ('Should return a promise which resolves when initial fetch happens', function (done) {
+		const poller = new Poller( { url: '/' } );
+		const spy = sinon.spy (poller, 'fetch');
 
-		var eventEmitterStub = sinon.stub(poller, 'emit');
+		const eventEmitterStub = sinon.stub (poller, 'emit');
 
-		poller.start( { initialRequest: true }).then(function() {
-			expect(eventEmitterStub.calledOnce).to.be.true;
-			done();
+		poller.start ({ initialRequest: true }).then (function () {
+			expect (eventEmitterStub.calledOnce).to.be.true;
+			done ();
 		});
-		expect(spy.callCount).to.equal(1);
+		expect (spy.callCount).to.equal (1);
 	});
 
-	it('Should resolve start with a promise immediately when not doing an initial fetch', function(done) {
-		var poller = new Poller( { url: '/' } );
-		var spy = sinon.spy(poller, 'fetch');
+	it ('Should resolve start with a promise immediately when not doing an initial fetch', function (done) {
+		const poller = new Poller( { url: '/' } );
+		const spy = sinon.spy (poller, 'fetch');
 
-		var eventEmitterStub = sinon.stub(poller, 'emit');
+		const eventEmitterStub = sinon.stub (poller, 'emit');
 
-		poller.start().then(function() {
-			expect(eventEmitterStub.calledOnce).to.be.false;
-			done();
+		poller.start ().then (function () {
+			expect (eventEmitterStub.calledOnce).to.be.false;
+			done ();
 		});
-		expect(spy.callCount).to.equal(0);
+		expect (spy.callCount).to.equal (0);
 	});
 
-	it('Should fire an event when a error is received from the server', function(done) {
+	it ('Should fire an event when a error is received from the server', function (done) {
 
-		var ft = nock('http://example.com')
-			.get('/')
-			.reply(503, {});
+		const ft = nock ('http://example.com')
+			.get ('/')
+			.reply (503, {});
 
-		var p = new Poller({
+		const p = new Poller({
 			url: 'http://example.com'
 		});
 
-		var eventEmitterStub = sinon.stub(p, 'emit');
-		p.fetch();
+		const eventEmitterStub = sinon.stub (p, 'emit');
+		p.fetch ();
 
-		setTimeout(function () {
-			expect(ft.isDone()).to.be.true; // ensure Nock has been used
-			expect(eventEmitterStub.calledOnce).to.be.true;
-			expect(eventEmitterStub.getCall(0).args[0]).to.equal('error');
-			done();
+		setTimeout (function () {
+			expect (ft.isDone ()).to.be.true; // ensure Nock has been used
+			expect (eventEmitterStub.calledOnce).to.be.true;
+			expect (eventEmitterStub.getCall (0).args[0]).to.equal ('error');
+			done ();
 		}, 10);
 
 	});
 
-	it('Should annotate the polling response with latency information', function(done) {
+	it ('Should annotate the polling response with latency information', function (done) {
 
-		var ft = nock('http://example.com')
-			.get('/1')
-			.reply(200, { 'foo': 1 });
+		const ft = nock ('http://example.com')
+			.get ('/1')
+			.reply (200, { 'foo': 1 });
 
-		var p = new Poller( { url: 'http://example.com/1', parseData: function () {} } );
+		const p = new Poller( { url: 'http://example.com/1', parseData: function () {} } );
 
-		var eventEmitterStub = sinon.stub(p, 'emit');
-		p.fetch();
+		const eventEmitterStub = sinon.stub (p, 'emit');
+		p.fetch ();
 
-		setTimeout(function () {
-			expect(ft.isDone()).to.be.true; // ensure Nock has been used
-			expect(eventEmitterStub.called).to.be.true;
-			expect(eventEmitterStub.getCall(0).args[0]).to.equal('ok');
-			expect(eventEmitterStub.getCall(0).args[2]).to.match(/^\d+$/);
-			done();
+		setTimeout (function () {
+			expect (ft.isDone ()).to.be.true; // ensure Nock has been used
+			expect (eventEmitterStub.called).to.be.true;
+			expect (eventEmitterStub.getCall (0).args[0]).to.equal ('ok');
+			expect (eventEmitterStub.getCall (0).args[2]).to.match (/^\d+$/);
+			done ();
 		}, 10);
 	});
 
-	it('Should handle POST requests', function(done) {
+	it ('Should handle POST requests', function (done) {
 
-		var ft = nock('http://example.com')
-			.post('/1')
-			.reply(200, { 'foo': 1 });
+		const ft = nock ('http://example.com')
+			.post ('/1')
+			.reply (200, { 'foo': 1 });
 
-		var p = new Poller({
+		const p = new Poller({
 			url: 'http://example.com/1',
 			options: {
 				method: 'POST'
@@ -201,25 +200,25 @@ describe('Poller', function() {
 			parseData: function () {}
 		});
 
-		var eventEmitterStub = sinon.stub(p, 'emit');
-		p.fetch();
+		const eventEmitterStub = sinon.stub (p, 'emit');
+		p.fetch ();
 
-		setTimeout(function () {
-			expect(ft.isDone()).to.be.true; // ensure Nock has been used
-			expect(eventEmitterStub.called).to.be.true;
-			expect(eventEmitterStub.getCall(0).args[0]).to.equal('ok');
-			expect(eventEmitterStub.getCall(0).args[2]).to.match(/^\d+$/);
-			done();
+		setTimeout (function () {
+			expect (ft.isDone ()).to.be.true; // ensure Nock has been used
+			expect (eventEmitterStub.called).to.be.true;
+			expect (eventEmitterStub.getCall (0).args[0]).to.equal ('ok');
+			expect (eventEmitterStub.getCall (0).args[2]).to.match (/^\d+$/);
+			done ();
 		}, 10);
 	});
 
-	it('Should be possible to retry requests', function () {
-		sinon.stub(Poller.prototype, 'eagerFetch', function () {
-			return Promise.reject({
+	it ('Should be possible to retry requests', function () {
+		sinon.stub (Poller.prototype, 'eagerFetch', function () {
+			return Promise.reject ({
 				message: 'network timeout at 12345'
 			});
 		});
-		var p = new Poller({
+		const p = new Poller({
 			url: 'http://example.com/1',
 			options: {
 				method: 'POST',
@@ -229,19 +228,19 @@ describe('Poller', function() {
 		});
 
 
-		p.fetch();
-		expect(p.eagerFetch.calledOnce).to.be.true;
-		Poller.prototype.eagerFetch.restore();
+		p.fetch ();
+		expect (p.eagerFetch.calledOnce).to.be.true;
+		Poller.prototype.eagerFetch.restore ();
 
 	});
 
-	it('Should be possible to act as data container', function(done) {
+	it ('Should be possible to act as data container', function (done) {
 
-		nock('http://example.com')
-			.get('/json')
-			.reply(200, { 'foo': 1 });
+		nock ('http://example.com')
+			.get ('/json')
+			.reply (200, { 'foo': 1 });
 
-		var p = new Poller( {
+		const p = new Poller( {
 				url: 'http://example.com/json',
 				defaultData: 0,
 				parseData: function (res) {
@@ -249,102 +248,102 @@ describe('Poller', function() {
 				}
 		});
 
-		expect(p.getData()).to.equal(0)
+		expect (p.getData ()).to.equal (0)
 
-		p.fetch();
-		setTimeout(function () {
-			expect(p.getData()).to.equal(1);
-			done();
+		p.fetch ();
+		setTimeout (function () {
+			expect (p.getData ()).to.equal (1);
+			done ();
 		}, 10);
 	});
 
-	it('Should define a default data parser', function(done) {
+	it ('Should define a default data parser', function (done) {
 
-		nock('http://example.com')
-			.get('/json')
-			.reply(200, { 'foo': 1 });
+		nock ('http://example.com')
+			.get ('/json')
+			.reply (200, { 'foo': 1 });
 
-		var p = new Poller( {
+		const p = new Poller( {
 				url: 'http://example.com/json',
 				defaultData: {}
 		});
 
-		p.fetch();
-		setTimeout(function () {
-			expect(p.getData()).to.deep.equal({foo: 1});
-			done();
+		p.fetch ();
+		setTimeout (function () {
+			expect (p.getData ()).to.deep.equal ({foo: 1});
+			done ();
 		}, 10);
 	});
 
-	it('Should be possible to autostart', function() {
+	it ('Should be possible to autostart', function () {
 
-		nock('http://example.com')
-			.get('/json')
-			.reply(200, { 'foo': 1 });
+		nock ('http://example.com')
+			.get ('/json')
+			.reply (200, { 'foo': 1 });
 
-		const stub = sinon.stub(Poller.prototype, 'start');
+		const stub = sinon.stub (Poller.prototype, 'start');
 
-		var p = new Poller( {
+		const p = new Poller( {
 				url: 'http://example.com/json',
 				defaultData: {},
 				autostart: true
 		});
 
-		expect(p.start.calledOnce).to.be.true;
-		expect(p.start.args[0][0]).to.deep.equal({initialRequest: true});
-		stub.restore();
+		expect (p.start.calledOnce).to.be.true;
+		expect (p.start.args[0][0]).to.deep.equal ({initialRequest: true});
+		stub.restore ();
 	});
 
-	xit('Should allow a maximum HTTP timeout of 4000ms');
-	xit('Should respond to receiving a Retry-After header');
+	xit ('Should allow a maximum HTTP timeout of 4000ms');
+	xit ('Should respond to receiving a Retry-After header');
 
-	it('Should fire a "data" event when new data is received and parsed', (done) => {
+	it ('Should fire a "data" event when new data is received and parsed', (done) => {
 		const stub = { 'foo': 1 };
-		nock('http://example.com')
-			.get('/json')
-			.reply(200, stub);
+		nock ('http://example.com')
+			.get ('/json')
+			.reply (200, stub);
 
-		var p = new Poller( {
+		const p = new Poller( {
 			url: 'http://example.com/json',
 			defaultData: 0
 		});
 
-		p.start({initialRequest:true});
-		p.once('data', data => {
-			expect(data).to.deep.equal(stub);
-			done();
+		p.start ({initialRequest:true});
+		p.once ('data', data => {
+			expect (data).to.deep.equal (stub);
+			done ();
 		})
 	});
 
-	it('Should have the ability to manually retry', done => {
+	it ('Should have the ability to manually retry', done => {
 		const stub1 = { 'foo': 1 };
-		nock('http://example.com')
-			.get('/json')
-			.reply(200, stub1)
+		nock ('http://example.com')
+			.get ('/json')
+			.reply (200, stub1)
 
-		var p = new Poller( {
+		const p = new Poller( {
 			url: 'http://example.com/json',
 			defaultData: 0
 		});
 
 		const onSecond = data => {
 			try{
-				expect(data).to.deep.equal(stub1);
-				done();
-			}catch(e){
-				done(e);
+				expect (data).to.deep.equal (stub1);
+				done ();
+			}catch (e) {
+				done (e);
 			}
 
 		};
 
 		const onFirst = () => {
-			p.once('data', onSecond);
-			p.retry();
+			p.once ('data', onSecond);
+			p.retry ();
 		};
 
-		p.once('data', onFirst);
+		p.once ('data', onFirst);
 
-		p.start({initialRequest:true});
+		p.start ({initialRequest:true});
 	})
 
 });

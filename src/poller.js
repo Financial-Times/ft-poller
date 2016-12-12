@@ -1,15 +1,13 @@
-'use strict';
-
-require('isomorphic-fetch');
+require ('isomorphic-fetch');
 
 module.exports = EventEmitter => {
 
 	return class Poller extends EventEmitter {
 
-		constructor(config){
-			super();
+		constructor (config) {
+			super ();
 			if (!config.url) {
-				throw new Error('ft-poller expects a url');
+				throw new Error ('ft-poller expects a url');
 			}
 
 			this.url = config.url;
@@ -32,74 +30,76 @@ module.exports = EventEmitter => {
 				};
 			this.poller = undefined;
 			if (config.autostart) {
-				this.start({initialRequest: true})
+				this.start ({initialRequest: true})
 			}
 		}
 
-		isRunning(){
+		isRunning () {
 			return !!this.poller;
 		}
 
-		stop(){
-			clearInterval(this.poller);
+		stop () {
+			clearInterval (this.poller);
 			this.poller = undefined;
 			return true;
 		}
 
-		start(opts){
+		start (opts) {
 			opts = opts || {};
 			let initialPromise;
-			if (!!this.isRunning()) {
-				throw new Error('Could not start job because the service is already running');
+			if (!!this.isRunning ()) {
+				throw new Error ('Could not start job because the service is already running');
 			}
 
 			if (opts.initialRequest) {
-				initialPromise = this.fetch();
+				initialPromise = this.fetch ();
 			}
 
-			this.poller = setInterval( () => {
-				this.fetch();
+			this.poller = setInterval (() => {
+				this.fetch ();
 			}, this.refreshInterval);
 
-			return opts.initialRequest ? initialPromise : Promise.resolve();
+			return opts.initialRequest ? initialPromise : Promise.resolve ();
 		}
 
-		retry(){
-			this.fetch();
-			clearInterval(this.poller);
-			this.poller = setInterval( () => {
-				this.fetch();
+		retry () {
+			this.fetch ();
+			clearInterval (this.poller);
+			this.poller = setInterval (() => {
+				this.fetch ();
 			}, this.refreshInterval);
 		}
 
-		fetch(){
-			const time = new Date();
+		fetch () {
+			const time = new Date ();
+			// Note - don't do this in the constructor as it means any instrumentation applied to fetch
+			// later is discarded within pollers
 			const _fetch = this.options.retry ? this.eagerFetch : fetch;
 
-			return _fetch(this.url, this.options)
-				.then( (response) => {
-					const latency = new Date() - time;
+			return _fetch (this.url, this.options)
+				.then ((response) => {
+					const latency = new Date () - time;
 					if (response.status === 200) {
-						this.emit('ok', response, latency);
+						this.emit ('ok', response, latency);
 					} else {
-						throw new Error(`Fetching ${response.url} failed with a ${response.status}, ${response.statusText}`);
+						throw new Error (`Fetching ${response.url} failed with a ${response.status}, ${response.statusText}`);
 					}
-					if ((response.headers.get('content-type') || '').indexOf('json') > -1) {
-						return response.json();
+					if ((response.headers.get ('content-type') || '').indexOf ('json') > -1) {
+						return response.json ();
 					} else {
-						return response.text();
+						return response.text ();
 					}
 				})
-				.then((s) => {
-					this.data = this.parseData(s);
-					this.emit('data', this.data);
+				.then ((s) => {
+					this.data = this.parseData (s);
+					this.emit ('data', this.data);
 				})
-				.catch( (err) => {
-					this.emit('error', err);
+				.catch ((err) => {
+					this.emit ('error', err);
 				});
 		}
 
-		getData(){
+		getData () {
 			return this.data;
 		}
 	}
