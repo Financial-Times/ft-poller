@@ -5,6 +5,7 @@ const Poller = require ('../src/server');
 const sinon = require ('sinon');
 const nock = require ('nock');
 const expect = chai.expect;
+const {HttpError} = require('../src/errors');
 
 describe ('Poller', function () {
 
@@ -161,6 +162,7 @@ describe ('Poller', function () {
 			expect (ft.isDone ()).to.be.true; // ensure Nock has been used
 			expect (eventEmitterStub.calledOnce).to.be.true;
 			expect (eventEmitterStub.getCall (0).args[0]).to.equal ('error');
+			expect(eventEmitterStub.getCall (0).args[1]).to.be.an.instanceOf(HttpError);
 			done ();
 		}, 10);
 
