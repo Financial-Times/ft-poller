@@ -1,5 +1,5 @@
 'use strict';
-const {HttpError} = require('./errors');
+const errors = require('./errors');
 
 require ('isomorphic-fetch');
 
@@ -85,7 +85,7 @@ module.exports = EventEmitter => {
 					if (response.ok) {
 						this.emit ('ok', response, latency);
 					} else {
-						throw new HttpError({url:this.url, method:this.options.method || 'GET', response});
+						throw new errors.HttpError({url:this.url, method:this.options.method || 'GET', response});
 					}
 					if ((response.headers.get ('content-type') || '').indexOf ('json') > -1) {
 						return response.json ();

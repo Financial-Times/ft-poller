@@ -1,8 +1,13 @@
+'use strict';
+
 const urlParser = require('url');
 
 class HttpError extends Error {
 
-	constructor ({url, method, response}){
+	constructor (opts){
+		const response = opts.response;
+		const method = opts.method;
+		const url = opts.url;
 		const message = `HTTP Error ${response.status} ${response.statusText}`;
 		super(message);
 		this.url = urlParser.parse(url, true);

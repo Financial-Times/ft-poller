@@ -5,7 +5,7 @@ const Poller = require ('../src/server');
 const sinon = require ('sinon');
 const nock = require ('nock');
 const expect = chai.expect;
-const {HttpError} = require('../src/errors');
+const HttpError = require('../src/errors').HttpError;
 
 describe ('Poller', function () {
 
