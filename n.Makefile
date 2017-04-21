@@ -14,6 +14,8 @@ endif
 # Enforce repo ownership
 ifeq ("$(wildcard ft.yml)","")
 $(error 'Projects making use of n-makefile *must* define an ft.yml file containing the repo owner's details (see any next- repo for required structure)')
+$(error 'If you are creating a project not to be maintained by the next team please feel free to copy what you need from our build tools but don't add an ft.yml.')
+$(error 'Integrating with our tooling may result in unwanted effects e.g. nightly builds, slack alerts, emails etc')
 endif
 
 # ./node_modules/.bin on the PATH
@@ -28,11 +30,12 @@ NPM_INSTALL = npm prune --production=false && npm install
 BOWER_INSTALL = bower prune && bower install --config.registry.search=http://registry.origami.ft.com --config.registry.search=https://bower.herokuapp.com
 JSON_GET_VALUE = grep $1 | head -n 1 | sed 's/[," ]//g' | cut -d : -f 2
 IS_GIT_IGNORED = grep -q $(if $1, $1, $@) .gitignore
-VERSION = v14
+VERSION = v23
 APP_NAME = $(shell cat package.json 2>/dev/null | $(call JSON_GET_VALUE,name))
 DONE = echo ✓ $@ done
 CONFIG_VARS = curl -fsL https://ft-next-config-vars.herokuapp.com/$1/$(call APP_NAME)$(if $2,.$2,) -H "Authorization: `heroku config:get APIKEY --app ft-next-config-vars`"
-
+IS_USER_FACING = `find . -type d \( -path ./bower_components -o -path ./node_modules \) -prune -o -name '*.html' -print`
+MAKEFILE_HAS_A11Y = `grep -rli "make a11y" Makefile`
 
 #
 # META TASKS
@@ -93,7 +96,7 @@ ifneq ($(CIRCLE_BUILD_NUM),)
 ifneq ($(shell grep -s -Fim 1 n-ui bower.json),)
 # versions in package.json and bower.json are not equal
 ifneq ($(shell awk '$$1 == "\"version\":" {print $$2}' bower_components/n-ui/.bower.json | sed s/,//),$(shell awk '$$1 == "\"version\":" {print $$2}'  node_modules/@financial-times/n-ui/package.json | sed s/,//))
-	$(error 'Projects using n-ui must maintain parity between versions. Rebuild without cache and update your bower.json and package.json if necessary')
+	$(error 'Projects using n-ui must maintain parity between versions. Rebuild without cache and update your bower.json and package.json if necessary. If this error persists make sure that the n-ui build succeeded in publishing a new version to NPM and that both NPM and Bower registries have the latest version.')
 endif
 endif
 endif
@@ -167,8 +170,11 @@ _verify_scss_lint:
 	@if [ -e .scss-lint.yml ]; then { scss-lint -c ./.scss-lint.yml `$(call GLOB,'*.scss')`; if [ $$? -ne 0 -a $$? -ne 1 ]; then exit 1; fi; $(DONE); } fi
 
 VERIFY_MSG_NO_DEMO = "Error: Components with templates must have a demo app, so that pa11y can test against it. This component doesn’t seem to have one. Add a demo app to continue peacefully. See n-image for an example."
-
+VERIFY_MSG_NO_PA11Y = "\n**** Error ****\nIt looks like your code is user-facing; your Makefile should include make a11y\nIf you need to disable a11y, use export IGNORE_A11Y = true in your Makefile\n********\n\n"
+#check if project has HTML and missing make a11y command
+#check if project has demo app if there's a make a11y command
 _verify_pa11y_testable:
+	@if [ "$(IS_USER_FACING)" ] && [ -z $(MAKEFILE_HAS_A11Y) ] && [ ! ${IGNORE_A11Y} ]; then (printf $(VERIFY_MSG_NO_PA11Y) && exit 1); fi
 	@if [ ! -d server ] && [ -d templates ] && [ ! -f demos/app.js ]; then (echo $(VERIFY_MSG_NO_DEMO) && exit 1); fi
 	@$(DONE)
 
