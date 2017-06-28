@@ -1,39 +1,33 @@
 {
-  "name": "ft-poller",
-  "version": "0.0.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Financial-Times/ft-poller"
-  },
-  "license": "MIT",
-  "description": "An http client to periodically fetch and cache data from web services",
-  "main": "./src/server.js",
-  "directories": {
-    "lib": "./lib"
-  },
-  "dependencies": {
-    "isomorphic-fetch": "^2.0.0",
-    "n-eager-fetch": "^2.0.0"
-  },
-  "devDependencies": {
-    "@financial-times/n-gage": "^1.1.7",
-    "chai": "^3.3.0",
-    "eslint": "^2.9.0",
-    "lintspaces-cli": "^0.1.1",
-    "mocha": "^2.3.3",
-    "nock": "^2.13.0",
-    "npm-prepublish": "^1.2.2",
-    "sinon": "^1.10.3",
-    "timer-shim": "^0.3.0"
-  },
-  "config": {
-    "pre-git": {
-      "pre-commit": [
-        "secret-squirrel"
-      ]
-    }
-  },
-  "scripts": {
-    "commit": "commit-wizard"
-  }
+	"name": "ft-poller",
+	"version": "0.0.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Financial-Times/ft-poller"
+	},
+	"license": "MIT",
+	"description": "An http client to periodically fetch and cache data from web services",
+	"main": "./src/server.js",
+	"directories": {
+		"lib": "./lib"
+	},
+	"dependencies": {
+		"isomorphic-fetch": "^2.0.0",
+		"n-eager-fetch": "^2.0.0"
+	},
+	"devDependencies": {
+		"@financial-times/n-gage": "^1.8.9",
+		"chai": "^3.3.0",
+		"eslint": "^2.9.0",
+		"lintspaces-cli": "^0.1.1",
+		"mocha": "^2.3.3",
+		"nock": "^2.13.0",
+		"npm-prepublish": "^1.2.2",
+		"sinon": "^1.10.3",
+		"timer-shim": "^0.3.0"
+	},
+	"scripts": {
+		"precommit": "make verify && node_modules/.bin/secret-squirrel",
+		"prepush": "make unit-test"
+	}
 }

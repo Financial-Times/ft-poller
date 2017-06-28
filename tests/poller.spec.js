@@ -250,7 +250,7 @@ describe ('Poller', function () {
 				}
 		});
 
-		expect (p.getData ()).to.equal (0)
+		expect (p.getData ()).to.equal (0);
 
 		p.fetch ();
 		setTimeout (function () {
@@ -314,14 +314,14 @@ describe ('Poller', function () {
 		p.once ('data', data => {
 			expect (data).to.deep.equal (stub);
 			done ();
-		})
+		});
 	});
 
 	it ('Should have the ability to manually retry', done => {
 		const stub1 = { 'foo': 1 };
 		nock ('http://example.com')
 			.get ('/json')
-			.reply (200, stub1)
+			.reply (200, stub1);
 
 		const p = new Poller( {
 			url: 'http://example.com/json',
@@ -346,6 +346,6 @@ describe ('Poller', function () {
 		p.once ('data', onFirst);
 
 		p.start ({initialRequest:true});
-	})
+	});
 
 });
