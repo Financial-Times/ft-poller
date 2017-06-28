@@ -33,7 +33,7 @@ module.exports = EventEmitter => {
 				};
 			this.poller = undefined;
 			if (config.autostart) {
-				this.start ({initialRequest: true})
+				this.start ({initialRequest: true});
 			}
 		}
 
@@ -105,5 +105,5 @@ module.exports = EventEmitter => {
 		getData () {
 			return this.data;
 		}
-	}
+	};
 };
