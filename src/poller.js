@@ -93,8 +93,8 @@ module.exports = EventEmitter => {
 						return response.text ();
 					}
 				})
-				.then ((s) => {
-					this.data = this.parseData (s);
+				.then (async s => {
+					this.data = await this.parseData (s);
 					this.emit ('data', this.data);
 				})
 				.catch ((err) => {

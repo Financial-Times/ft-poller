@@ -27,7 +27,8 @@
     "timer-shim": "^0.3.0"
   },
   "scripts": {
-    "precommit": "make verify && node_modules/.bin/secret-squirrel",
-    "prepush": "make unit-test"
+    "precommit": "node_modules/.bin/secret-squirrel",
+    "prepush": "make unit-test && make verify -j3",
+    "commitmsg": "node_modules/.bin/secret-squirrel-commitmsg"
   }
 }

@@ -1,6 +1,6 @@
 machine:
   node:
-    version: 4.7.0
+    version: 8.2.0
 deployment:
   release:
     tag: /v.*/
