@@ -277,6 +277,25 @@ describe ('Poller', function () {
 		}, 10);
 	});
 
+	it ('Should allow async data parser', function (done) {
+
+		nock ('http://example.com')
+			.get ('/json')
+			.reply (200, { 'foo': 1 });
+
+		const p = new Poller( {
+				url: 'http://example.com/json',
+				defaultData: {},
+				parseData: () => Promise.resolve({bar: 2})
+		});
+
+		p.fetch ();
+		setTimeout (function () {
+			expect (p.getData ()).to.deep.equal ({bar: 2});
+			done ();
+		}, 10);
+	});
+
 	it ('Should be possible to autostart', function () {
 
 		nock ('http://example.com')
