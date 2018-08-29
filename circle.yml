@@ -1,9 +1,0 @@
-machine:
-  node:
-    version: 8.2.0
-deployment:
-  release:
-    tag: /v.*/
-    owner: Financial-Times
-    commands:
-      - make npm-publish
