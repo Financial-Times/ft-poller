@@ -24,11 +24,13 @@
     "nock": "^2.13.0",
     "npm-prepublish": "^1.2.2",
     "sinon": "^1.10.3",
+    "snyk": "^1.167.2",
     "timer-shim": "^0.3.0"
   },
   "scripts": {
     "precommit": "node_modules/.bin/secret-squirrel",
     "prepush": "make unit-test && make verify -j3",
-    "commitmsg": "node_modules/.bin/secret-squirrel-commitmsg"
+    "commitmsg": "node_modules/.bin/secret-squirrel-commitmsg",
+    "prepare": "npx snyk protect || npx snyk protect -d || true"
   }
 }
