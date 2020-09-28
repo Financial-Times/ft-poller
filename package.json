@@ -32,5 +32,8 @@
     "prepush": "make unit-test && make verify -j3",
     "commitmsg": "node_modules/.bin/secret-squirrel-commitmsg",
     "prepare": "npx snyk protect || npx snyk protect -d || true"
+  },
+  "engines": {
+    "node": "14.x"
   }
 }
