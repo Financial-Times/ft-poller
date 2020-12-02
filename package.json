@@ -16,7 +16,7 @@
     "n-eager-fetch": "^2.0.0"
   },
   "devDependencies": {
-    "@financial-times/n-gage": "^3.5.0",
+    "@financial-times/n-gage": "^8.0.0",
     "chai": "^3.3.0",
     "eslint": "^6.0.0",
     "lintspaces-cli": "^0.1.1",
