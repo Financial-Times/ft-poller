@@ -12,7 +12,7 @@
     "lib": "./lib"
   },
   "dependencies": {
-    "isomorphic-fetch": "^2.0.0",
+    "isomorphic-fetch": "^3.0.0",
     "n-eager-fetch": "^2.0.0"
   },
   "devDependencies": {
