@@ -16,7 +16,7 @@
     "n-eager-fetch": "^2.0.0"
   },
   "devDependencies": {
-    "@financial-times/n-gage": "^3.5.0",
+    "@financial-times/n-gage": "^8.3.2",
     "chai": "^3.3.0",
     "eslint": "^6.0.0",
     "lintspaces-cli": "^0.1.1",
@@ -28,12 +28,16 @@
     "timer-shim": "^0.3.0"
   },
   "scripts": {
-    "precommit": "node_modules/.bin/secret-squirrel",
-    "prepush": "make unit-test && make verify -j3",
-    "commitmsg": "node_modules/.bin/secret-squirrel-commitmsg",
     "prepare": "npx snyk protect || npx snyk protect -d || true"
   },
   "engines": {
     "node": "12.x"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "node_modules/.bin/secret-squirrel-commitmsg",
+      "pre-commit": "node_modules/.bin/secret-squirrel",
+      "pre-push": "make unit-test && make verify -j3"
+    }
   }
 }

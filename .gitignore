@@ -2,5 +2,4 @@ node_modules
 .editorconfig
 .eslintrc.js
 
-package-lock.json
 *.env*
