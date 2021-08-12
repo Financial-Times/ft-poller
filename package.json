@@ -18,6 +18,7 @@
   "devDependencies": {
     "@financial-times/n-gage": "^8.3.2",
     "chai": "^3.3.0",
+    "check-engines": "^1.5.0",
     "eslint": "^6.0.0",
     "lintspaces-cli": "^0.1.1",
     "mocha": "^2.3.3",
@@ -28,10 +29,12 @@
     "timer-shim": "^0.3.0"
   },
   "scripts": {
-    "prepare": "npx snyk protect || npx snyk protect -d || true"
+    "prepare": "npx snyk protect || npx snyk protect -d || true",
+    "preinstall": "npm_config_yes=true npx check-engine"
   },
   "engines": {
-    "node": "12.x"
+    "node": "12.x",
+    "npm": "7.x"
   },
   "husky": {
     "hooks": {
@@ -39,5 +42,9 @@
       "pre-commit": "node_modules/.bin/secret-squirrel",
       "pre-push": "make unit-test && make verify -j3"
     }
+  },
+  "volta": {
+    "node": "12.22.5",
+    "npm": "7.20.2"
   }
 }
