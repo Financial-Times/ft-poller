@@ -33,7 +33,7 @@
     "preinstall": "[ \"$INIT_CWD\" != \"$PWD\" ] || npm_config_yes=true npx check-engine"
   },
   "engines": {
-    "node": "12.x",
+    "node": "14.x || 16.x",
     "npm": "7.x || 8.x"
   },
   "husky": {
@@ -44,7 +44,7 @@
     }
   },
   "volta": {
-    "node": "12.22.5",
+    "node": "16.14.1",
     "npm": "7.20.2"
   }
 }
