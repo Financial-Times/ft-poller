@@ -21,7 +21,7 @@
     "check-engine": "^1.10.1",
     "eslint": "^6.0.0",
     "lintspaces-cli": "^0.1.1",
-    "mocha": "^2.3.3",
+    "mocha": "^3.0.0",
     "nock": "^2.13.0",
     "npm-prepublish": "^1.2.2",
     "sinon": "^1.10.3",
