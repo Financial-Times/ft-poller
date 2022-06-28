@@ -168,6 +168,59 @@ describe ('Poller', function () {
 
 	});
 
+	it ('Should throw from getData when fetch has received an HTTP error', function (done) {
+
+		const ft = nock ('http://example.com')
+			.get ('/')
+			.reply (503, {});
+
+		const p = new Poller({
+			url: 'http://example.com'
+		});
+
+		p.fetch ();
+
+		setTimeout (function () {
+			expect (ft.isDone ()).to.be.true; // ensure Nock has been used
+			expect (function () {
+				p.getData ();
+			}).to.throw ('HTTP Error 503 Service Unavailable');
+			done ();
+		}, 10);
+
+	});
+
+	it ('Should return data from getData when fetch has received an HTTP error followed by a success', function (done) {
+
+		const ft = nock ('http://example.com');
+
+		const p = new Poller({
+			url: 'http://example.com'
+		});
+
+		ft.get ('/').reply (503, '<h1>error</h1>');
+
+		p.fetch ();
+
+		setTimeout (function () {
+			expect (ft.isDone ()).to.be.true; // ensure Nock has been used
+			expect (function () {
+				p.getData ();
+			}).to.throw ('HTTP Error 503 Service Unavailable');
+
+			ft.get ('/').reply (200, '<h1>website</h1>')
+
+			p.fetch()
+
+			setTimeout (function () {
+				expect (p.getData ()).to.equal ('<h1>website</h1>');
+				done ();
+			}, 10);
+
+		}, 10);
+
+	});
+
 	it ('Should annotate the polling response with latency information', function (done) {
 
 		const ft = nock ('http://example.com')
