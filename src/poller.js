@@ -89,8 +89,8 @@ module.exports = EventEmitter => {
 				.then ((response) => {
 					const latency = new Date () - time;
 					if (response.ok) {
-						this.emit ('ok', response, latency);
 						this.error = undefined;
+						this.emit ('ok', response, latency);
 					} else {
 						throw new errors.HttpError({url:this.url, method:this.options.method || 'GET', response});
 					}
