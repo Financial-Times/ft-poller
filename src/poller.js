@@ -35,6 +35,12 @@ module.exports = EventEmitter => {
 			if (config.autostart) {
 				this.start ({initialRequest: true});
 			}
+
+			// We must listen to the error event to prevent throwing when we receive an HTTP error
+			// https://nodejs.org/docs/latest-v16.x/api/events.html#error-events
+			this.on('error', (error) => {
+				this.error = error;
+			});
 		}
 
 		isRunning () {
@@ -83,6 +89,7 @@ module.exports = EventEmitter => {
 				.then ((response) => {
 					const latency = new Date () - time;
 					if (response.ok) {
+						this.error = undefined;
 						this.emit ('ok', response, latency);
 					} else {
 						throw new errors.HttpError({url:this.url, method:this.options.method || 'GET', response});
@@ -103,6 +110,10 @@ module.exports = EventEmitter => {
 		}
 
 		getData () {
+			if (this.error) {
+				throw this.error;
+			}
+
 			return this.data;
 		}
 	};

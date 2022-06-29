@@ -38,7 +38,7 @@ parseData: function (data) {
 
 * `stop()` - Stops polling
 
-* `getData()` - Returns the last set of data retrieved from the server (post-processed if `parseData` function exists)
+* `getData()` - Returns the last set of data retrieved from the server (post-processed if `parseData` function exists). This will throw an `HttpError` if the most recent fetch received an error.
 
 #### Events
 
