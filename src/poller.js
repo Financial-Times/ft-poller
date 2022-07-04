@@ -32,15 +32,16 @@ module.exports = EventEmitter => {
 					return data;
 				};
 			this.poller = undefined;
-			if (config.autostart) {
-				this.start ({initialRequest: true});
-			}
-
+			
 			// We must listen to the error event to prevent throwing when we receive an HTTP error
 			// https://nodejs.org/docs/latest-v16.x/api/events.html#error-events
 			this.on('error', (error) => {
 				this.error = error;
 			});
+			
+			if (config.autostart) {
+				this.start ({initialRequest: true});
+			}
 		}
 
 		isRunning () {
