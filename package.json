@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "isomorphic-fetch": "^2.0.0",
-    "n-eager-fetch": "^4.0.0"
+    "n-eager-fetch": "^5.1.0"
   },
   "devDependencies": {
     "@financial-times/n-gage": "^8.3.2",
