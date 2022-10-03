@@ -110,10 +110,6 @@ module.exports = EventEmitter => {
 		}
 
 		getData () {
-			if (this.error) {
-				throw this.error;
-			}
-
 			return this.data;
 		}
 	};

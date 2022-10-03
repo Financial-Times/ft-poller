@@ -168,55 +168,29 @@ describe ('Poller', function () {
 
 	});
 
-	it ('Should throw from getData when fetch has received an HTTP error', function (done) {
+	it ('Should return defaultData if the server errors after the poller autostarts without listening for errors', function (done) {
 
 		const ft = nock ('http://example.com')
 			.get ('/')
 			.reply (503, {});
 
+		const defaultData = [1, 2, 3]
+
 		const p = new Poller({
-			url: 'http://example.com'
+			url: 'http://example.com',
+			defaultData,
+			autostart: true,
 		});
 
-		p.fetch ();
+		const eventEmitterStub = sinon.stub (p, 'emit');
 
 		setTimeout (function () {
-			expect (ft.isDone ()).to.be.true; // ensure Nock has been used
-			expect (function () {
-				p.getData ();
-			}).to.throw ('HTTP Error 503 Service Unavailable');
+			expect (p.getData()).to.deep.equal(defaultData);
+			expect (ft.isDone()).to.be.true; // ensure Nock has been used
+			expect (eventEmitterStub.calledOnce).to.be.true;
+			expect (eventEmitterStub.getCall (0).args[0]).to.equal ('error');
+			expect(eventEmitterStub.getCall (0).args[1]).to.be.an.instanceOf(HttpError);
 			done ();
-		}, 10);
-
-	});
-
-	it ('Should return data from getData when fetch has received an HTTP error followed by a success', function (done) {
-
-		const ft = nock ('http://example.com');
-
-		const p = new Poller({
-			url: 'http://example.com'
-		});
-
-		ft.get ('/').reply (503, '<h1>error</h1>');
-
-		p.fetch ();
-
-		setTimeout (function () {
-			expect (ft.isDone ()).to.be.true; // ensure Nock has been used
-			expect (function () {
-				p.getData ();
-			}).to.throw ('HTTP Error 503 Service Unavailable');
-
-			ft.get ('/').reply (200, '<h1>website</h1>')
-
-			p.fetch()
-
-			setTimeout (function () {
-				expect (p.getData ()).to.equal ('<h1>website</h1>');
-				done ();
-			}, 10);
-
 		}, 10);
 
 	});
