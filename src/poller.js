@@ -1,11 +1,12 @@
 'use strict';
 const errors = require('./errors');
+const logger = require('@financial-times/n-logger').default;
 
 require ('isomorphic-fetch');
 
 module.exports = EventEmitter => {
 
-	return class Poller extends EventEmitter {
+	class Poller extends EventEmitter {
 
 		constructor (config) {
 			super ();
@@ -16,6 +17,7 @@ module.exports = EventEmitter => {
 			this.url = config.url;
 			this.options = config.options || {};
 			this.data = config.defaultData;
+			this.state = Poller.states.INITIAL;
 			this.options.timeout = this.options.timeout || 4000;
 
 			this.options.headers = this.options.headers || {};
@@ -102,15 +104,48 @@ module.exports = EventEmitter => {
 				})
 				.then (async s => {
 					this.data = await this.parseData (s);
+					this.setState (Poller.states.FRESH);
 					this.emit ('data', this.data);
 				})
 				.catch ((err) => {
+					if (this.state === Poller.states.INITIAL) {
+						this.setState (Poller.states.ERRORING, err);
+					} else {
+						this.setState (Poller.states.STALE, err);
+					}
 					this.emit ('error', err);
 				});
+		}
+
+		setState (state, error) {
+			this.state = state;
+			if (state === Poller.states.ERRORING) {
+				logger.error (
+					'Poller is serving default data. It was unable to fetch fresh data',
+					{ event: 'POLLER_DATA_DEFAULT' },
+					error
+				);
+			}
+			if (state === Poller.states.STALE) {
+				logger.warn (
+					'Poller is serving stale data. It was unable to fetch fresh data',
+					{ event: 'POLLER_DATA_STALE' },
+					error
+				);
+			}
 		}
 
 		getData () {
 			return this.data;
 		}
 	};
+
+	Poller.states = {
+		INITIAL: 'initial',
+		ERRORING: 'erroring',
+		STALE: 'stale',
+		FRESH: 'fresh'
+	};
+
+	return Poller;
 };
