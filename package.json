@@ -14,7 +14,6 @@
   "dependencies": {
     "@financial-times/n-logger": "^10.3.0",
     "isomorphic-fetch": "^2.0.0",
-    "mockery": "^2.1.0",
     "n-eager-fetch": "^5.1.0"
   },
   "devDependencies": {
@@ -24,6 +23,7 @@
     "eslint": "^6.0.0",
     "lintspaces-cli": "^0.1.1",
     "mocha": "^2.3.3",
+    "mockery": "^2.1.0",
     "nock": "^2.13.0",
     "npm-prepublish": "^1.2.2",
     "sinon": "^1.10.3",
