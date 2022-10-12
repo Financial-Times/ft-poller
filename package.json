@@ -12,7 +12,9 @@
     "lib": "./lib"
   },
   "dependencies": {
+    "@financial-times/n-logger": "^10.3.0",
     "isomorphic-fetch": "^2.0.0",
+    "mockery": "^2.1.0",
     "n-eager-fetch": "^5.1.0"
   },
   "devDependencies": {

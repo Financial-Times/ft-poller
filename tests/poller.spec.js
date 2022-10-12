@@ -1,11 +1,24 @@
 /* global it, describe, xit */
 
+const mockery = require ('mockery');
 const chai = require ('chai');
-const Poller = require ('../src/server');
 const sinon = require ('sinon');
 const nock = require ('nock');
 const expect = chai.expect;
 const HttpError = require('../src/errors').HttpError;
+
+mockery.enable ({
+	warnOnReplace: false,
+	warnOnUnregistered: false
+});
+
+const mockLogger = {
+	error: sinon.stub(),
+	warn: sinon.stub()
+};
+mockery.registerMock ('@financial-times/n-logger', { default: mockLogger });
+
+const Poller = require ('../src/server');
 
 describe ('Poller', function () {
 
@@ -168,55 +181,29 @@ describe ('Poller', function () {
 
 	});
 
-	it ('Should throw from getData when fetch has received an HTTP error', function (done) {
+	it ('Should return defaultData if the server errors after the poller autostarts without listening for errors', function (done) {
 
 		const ft = nock ('http://example.com')
 			.get ('/')
 			.reply (503, {});
 
+		const defaultData = [1, 2, 3]
+
 		const p = new Poller({
-			url: 'http://example.com'
+			url: 'http://example.com',
+			defaultData,
+			autostart: true,
 		});
 
-		p.fetch ();
+		const eventEmitterStub = sinon.stub (p, 'emit');
 
 		setTimeout (function () {
-			expect (ft.isDone ()).to.be.true; // ensure Nock has been used
-			expect (function () {
-				p.getData ();
-			}).to.throw ('HTTP Error 503 Service Unavailable');
+			expect (p.getData()).to.deep.equal(defaultData);
+			expect (ft.isDone()).to.be.true; // ensure Nock has been used
+			expect (eventEmitterStub.calledOnce).to.be.true;
+			expect (eventEmitterStub.getCall (0).args[0]).to.equal ('error');
+			expect(eventEmitterStub.getCall (0).args[1]).to.be.an.instanceOf(HttpError);
 			done ();
-		}, 10);
-
-	});
-
-	it ('Should return data from getData when fetch has received an HTTP error followed by a success', function (done) {
-
-		const ft = nock ('http://example.com');
-
-		const p = new Poller({
-			url: 'http://example.com'
-		});
-
-		ft.get ('/').reply (503, '<h1>error</h1>');
-
-		p.fetch ();
-
-		setTimeout (function () {
-			expect (ft.isDone ()).to.be.true; // ensure Nock has been used
-			expect (function () {
-				p.getData ();
-			}).to.throw ('HTTP Error 503 Service Unavailable');
-
-			ft.get ('/').reply (200, '<h1>website</h1>')
-
-			p.fetch()
-
-			setTimeout (function () {
-				expect (p.getData ()).to.equal ('<h1>website</h1>');
-				done ();
-			}, 10);
-
 		}, 10);
 
 	});
@@ -418,6 +405,109 @@ describe ('Poller', function () {
 		p.once ('data', onFirst);
 
 		p.start ({initialRequest:true});
+	});
+
+	describe('state management and logging', () => {
+		let poller;
+
+		beforeEach(() => {
+			mockLogger.error.reset();
+			mockLogger.warn.reset();
+			poller = new Poller({
+				url: 'http://example.com/states',
+				defaultData: { isDefaultData: true }
+			});
+		});
+
+		it('should have a state of "initial"', () => {
+			expect(poller.state).to.equal('initial');
+		});
+
+		it('should have default data', () => {
+			expect(poller.getData()).to.deep.equal({ isDefaultData: true });
+		});
+
+		describe('when the first fetch resolves', () => {
+
+			beforeEach(async () => {
+				nock('http://example.com')
+					.get('/states')
+					.once()
+					.reply(200, { isOriginalData: true });
+				await poller.fetch();
+			});
+
+			it('should have a state of "fresh"', () => {
+				expect(poller.state).to.equal('fresh');
+			});
+
+			it('should have fresh data', () => {
+				expect(poller.getData()).to.deep.equal({ isOriginalData: true });
+			});
+
+			it('should not log errors or warnings', () => {
+				expect(mockLogger.error.callCount).to.equal(0);
+				expect(mockLogger.warn.callCount).to.equal(0);
+			});
+
+			describe('when the second fetch rejects', () => {
+
+				beforeEach(async () => {
+					nock('http://example.com')
+						.get('/states')
+						.once()
+						.reply(500, { isDataFromError: true });
+					await poller.fetch();
+				});
+
+				it('should have a state of "stale"', () => {
+					expect(poller.state).to.equal('stale');
+				});
+
+				it('should have stale data', () => {
+					expect(poller.getData()).to.deep.equal({ isOriginalData: true });
+				});
+
+				it('should log a warning message', () => {
+					expect(mockLogger.warn.callCount).to.equal(1);
+					const args = mockLogger.warn.getCall(0).args;
+					expect(args[0]).to.equal('Poller is serving stale data. It was unable to fetch fresh data');
+					expect(args[1]).to.deep.equal({ event: 'POLLER_DATA_STALE' });
+					expect(args[2]).to.be.instanceOf(HttpError);
+				});
+
+			});
+
+		});
+
+		describe('when the first fetch rejects', () => {
+
+			beforeEach(async () => {
+				nock('http://example.com')
+					.get('/states')
+					.once()
+					.reply(500, { isDataFromError: true });
+				await poller.fetch();
+			});
+
+			it('should have a state of "erroring"', () => {
+				expect(poller.state).to.equal('erroring');
+			});
+
+			it('should have default data', () => {
+				expect(poller.getData()).to.deep.equal({ isDefaultData: true });
+			});
+
+			it('should log an error message', () => {
+				expect(mockLogger.error.callCount).to.equal(1);
+				const args = mockLogger.error.getCall(0).args;
+				expect(args[0]).to.equal('Poller is serving default data. It was unable to fetch fresh data');
+				expect(args[1]).to.deep.equal({ event: 'POLLER_DATA_DEFAULT' });
+				expect(args[2]).to.be.instanceOf(HttpError);
+			});
+
+		});
+
 	});
 
 });
