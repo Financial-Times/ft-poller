@@ -1,4 +1,4 @@
-/* global it, describe, xit */
+/* global it, describe */
 
 const mockery = require ('mockery');
 const chai = require ('chai');
@@ -30,6 +30,7 @@ describe ('Poller', function () {
 		const poller = new Poller( { url: '/' } );
 		poller.start ();
 		expect (poller.isRunning ()).to.equal (true);
+		poller.stop ();
 	});
 
 	it ('Should avoid starting a job twice', function () {
@@ -38,6 +39,7 @@ describe ('Poller', function () {
 		expect (function () {
 			poller.start ();
 		}).to.throw ('Could not start job because the service is already running');
+		poller.stop ();
 	});
 
 	it ('Should stop a job', function () {
@@ -122,7 +124,7 @@ describe ('Poller', function () {
 		poller.start ();
 		clock.tick (6000); // fast-forward 6 seconds
 		clock.restore ();
-
+		poller.stop ();
 	});
 
 	it ('Should allow the first scheduled poll to happen immediately', function () {
@@ -130,6 +132,7 @@ describe ('Poller', function () {
 		const spy = sinon.spy (poller, 'fetch');
 		poller.start ({ initialRequest: true });
 		expect (spy.callCount).to.equal (1);
+		poller.stop ();
 	});
 
 	it ('Should return a promise which resolves when initial fetch happens', function (done) {
@@ -143,6 +146,7 @@ describe ('Poller', function () {
 			done ();
 		});
 		expect (spy.callCount).to.equal (1);
+		poller.stop ();
 	});
 
 	it ('Should resolve start with a promise immediately when not doing an initial fetch', function (done) {
@@ -156,6 +160,7 @@ describe ('Poller', function () {
 			done ();
 		});
 		expect (spy.callCount).to.equal (0);
+		poller.stop ();
 	});
 
 	it ('Should fire an event when a error is received from the server', function (done) {
@@ -205,7 +210,7 @@ describe ('Poller', function () {
 			expect(eventEmitterStub.getCall (0).args[1]).to.be.an.instanceOf(HttpError);
 			done ();
 		}, 10);
-
+		p.stop ();
 	});
 
 	it ('Should annotate the polling response with latency information', function (done) {
@@ -351,10 +356,8 @@ describe ('Poller', function () {
 		expect (p.start.calledOnce).to.be.true;
 		expect (p.start.args[0][0]).to.deep.equal ({initialRequest: true});
 		stub.restore ();
+		p.stop ();
 	});
-
-	xit ('Should allow a maximum HTTP timeout of 4000ms');
-	xit ('Should respond to receiving a Retry-After header');
 
 	it ('Should fire a "data" event when new data is received and parsed', (done) => {
 		const stub = { 'foo': 1 };
@@ -372,6 +375,7 @@ describe ('Poller', function () {
 			expect (data).to.deep.equal (stub);
 			done ();
 		});
+		p.stop ();
 	});
 
 	it ('Should have the ability to manually retry', done => {
@@ -398,6 +402,7 @@ describe ('Poller', function () {
 		const onFirst = () => {
 			p.once ('data', onSecond);
 			p.retry ();
+			p.stop ();
 		};
 
 		p.once ('data', onFirst);
