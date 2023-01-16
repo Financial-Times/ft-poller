@@ -54,12 +54,12 @@ describe ('Poller', function () {
 			.reply (200, { 'foo': 1 }, { 'Content-Type': 'application/json; charset=utf-8' });
 
 		const p = new Poller( {
-				url: 'http://example.com/json-charset',
-				parseData: function (res) {
-					expect (ft.isDone ()).to.be.true; // ensure Nock has been used
-					expect (res.foo).to.equal (1);
-					done ();
-				}
+			url: 'http://example.com/json-charset',
+			parseData: function (res) {
+				expect (ft.isDone ()).to.be.true; // ensure Nock has been used
+				expect (res.foo).to.equal (1);
+				done ();
+			}
 		});
 
 		p.fetch ();
@@ -72,12 +72,12 @@ describe ('Poller', function () {
 			.reply (200, { 'foo': 1 });
 
 		const p = new Poller( {
-				url: 'http://example.com/json',
-				parseData: function (res) {
-					expect (ft.isDone ()).to.be.true; // ensure Nock has been used
-					expect (res.foo).to.equal (1);
-					done ();
-				}
+			url: 'http://example.com/json',
+			parseData: function (res) {
+				expect (ft.isDone ()).to.be.true; // ensure Nock has been used
+				expect (res.foo).to.equal (1);
+				done ();
+			}
 		});
 
 		p.fetch ();
@@ -90,12 +90,12 @@ describe ('Poller', function () {
 			.reply (200, 'hello world');
 
 		const p = new Poller( {
-				url: 'http://example.com',
-				parseData: function (res) {
-					expect (ft.isDone ()).to.be.true; // ensure Nock has been used
-					expect (res).to.equal ('hello world');
-					done ();
-				}
+			url: 'http://example.com',
+			parseData: function (res) {
+				expect (ft.isDone ()).to.be.true; // ensure Nock has been used
+				expect (res).to.equal ('hello world');
+				done ();
+			}
 		});
 
 		p.fetch ();
@@ -110,17 +110,17 @@ describe ('Poller', function () {
 		const clock = sinon.useFakeTimers ();
 
 		const poller = new Poller({
-				url: 'http://example.com',
-				refreshInterval: 5000,
-				parseData: function (res) {
-					expect (res.foo).to.equal (1);
-					expect (ft.isDone ()).to.be.true; // ensure Nock has been used
-					done ();
-				}
-			});
+			url: 'http://example.com',
+			refreshInterval: 5000,
+			parseData: function (res) {
+				expect (res.foo).to.equal (1);
+				expect (ft.isDone ()).to.be.true; // ensure Nock has been used
+				done ();
+			}
+		});
 
 		poller.start ();
-		clock.tick (6000);  // fast-forward 6 seconds
+		clock.tick (6000); // fast-forward 6 seconds
 		clock.restore ();
 
 	});
@@ -187,7 +187,7 @@ describe ('Poller', function () {
 			.get ('/')
 			.reply (503, {});
 
-		const defaultData = [1, 2, 3]
+		const defaultData = [1, 2, 3];
 
 		const p = new Poller({
 			url: 'http://example.com',
@@ -256,9 +256,7 @@ describe ('Poller', function () {
 
 	it ('Should be possible to retry requests', function () {
 		sinon.stub (Poller.prototype, 'eagerFetch', function () {
-			return Promise.reject ({
-				message: 'network timeout at 12345'
-			});
+			return Promise.reject (new Error ('network timeout at 12345'));
 		});
 		const p = new Poller({
 			url: 'http://example.com/1',
@@ -283,11 +281,11 @@ describe ('Poller', function () {
 			.reply (200, { 'foo': 1 });
 
 		const p = new Poller( {
-				url: 'http://example.com/json',
-				defaultData: 0,
-				parseData: function (res) {
-					return res.foo;
-				}
+			url: 'http://example.com/json',
+			defaultData: 0,
+			parseData: function (res) {
+				return res.foo;
+			}
 		});
 
 		expect (p.getData ()).to.equal (0);
@@ -306,8 +304,8 @@ describe ('Poller', function () {
 			.reply (200, { 'foo': 1 });
 
 		const p = new Poller( {
-				url: 'http://example.com/json',
-				defaultData: {}
+			url: 'http://example.com/json',
+			defaultData: {}
 		});
 
 		p.fetch ();
@@ -324,9 +322,9 @@ describe ('Poller', function () {
 			.reply (200, { 'foo': 1 });
 
 		const p = new Poller( {
-				url: 'http://example.com/json',
-				defaultData: {},
-				parseData: () => Promise.resolve({bar: 2})
+			url: 'http://example.com/json',
+			defaultData: {},
+			parseData: () => Promise.resolve({bar: 2})
 		});
 
 		p.fetch ();
@@ -345,9 +343,9 @@ describe ('Poller', function () {
 		const stub = sinon.stub (Poller.prototype, 'start');
 
 		const p = new Poller( {
-				url: 'http://example.com/json',
-				defaultData: {},
-				autostart: true
+			url: 'http://example.com/json',
+			defaultData: {},
+			autostart: true
 		});
 
 		expect (p.start.calledOnce).to.be.true;

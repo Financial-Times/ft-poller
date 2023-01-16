@@ -31,8 +31,8 @@ module.exports = EventEmitter => {
 
 			this.refreshInterval = config.refreshInterval || 60000;
 			this.parseData = config.parseData || function (data) {
-					return data;
-				};
+				return data;
+			};
 			this.poller = undefined;
 			if (config.autostart) {
 				this.start ({initialRequest: true});
