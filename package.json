@@ -17,12 +17,16 @@
     "n-eager-fetch": "^5.1.0"
   },
   "devDependencies": {
-    "@financial-times/n-gage": "^8.3.2",
+    "@dotcom-tool-kit/component": "^2.1.1",
+    "@dotcom-tool-kit/eslint": "^2.2.5",
+    "@dotcom-tool-kit/mocha": "^2.2.1",
+    "@financial-times/eslint-config-next": "^6.0.0",
     "chai": "^3.3.0",
     "check-engine": "^1.10.1",
-    "eslint": "^6.0.0",
+    "dotcom-tool-kit": "^2.4.2",
+    "eslint": "^8.32.0",
     "lintspaces-cli": "^0.1.1",
-    "mocha": "^2.3.3",
+    "mocha": "^6.2.3",
     "mockery": "^2.1.0",
     "nock": "^2.13.0",
     "npm-prepublish": "^1.2.2",
@@ -32,7 +36,10 @@
   },
   "scripts": {
     "prepare": "npx snyk protect || npx snyk protect -d || true",
-    "preinstall": "[ \"$INIT_CWD\" != \"$PWD\" ] || npm_config_yes=true npx check-engine"
+    "preinstall": "[ \"$INIT_CWD\" != \"$PWD\" ] || npm_config_yes=true npx check-engine",
+    "build": "dotcom-tool-kit build:local",
+    "test": "dotcom-tool-kit test:local",
+    "start": "dotcom-tool-kit run:local"
   },
   "engines": {
     "node": "14.x || 16.x",
@@ -40,9 +47,9 @@
   },
   "husky": {
     "hooks": {
-      "commit-msg": "node_modules/.bin/secret-squirrel-commitmsg",
-      "pre-commit": "node_modules/.bin/secret-squirrel",
-      "pre-push": "make unit-test && make verify -j3"
+      "commit-msg": "dotcom-tool-kit git:commitmsg",
+      "pre-commit": "dotcom-tool-kit git:precommit",
+      "pre-push": "dotcom-tool-kit test:local"
     }
   },
   "volta": {
