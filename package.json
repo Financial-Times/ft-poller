@@ -28,7 +28,7 @@
     "lintspaces-cli": "^0.1.1",
     "mocha": "^6.2.3",
     "mockery": "^2.1.0",
-    "nock": "^2.13.0",
+    "nock": "^13.3.0",
     "npm-prepublish": "^1.2.2",
     "sinon": "^1.10.3",
     "snyk": "^1.167.2",
