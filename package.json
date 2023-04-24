@@ -17,13 +17,13 @@
     "n-eager-fetch": "^7.0.0"
   },
   "devDependencies": {
-    "@dotcom-tool-kit/component": "^2.1.1",
-    "@dotcom-tool-kit/eslint": "^2.2.5",
-    "@dotcom-tool-kit/mocha": "^2.2.1",
+    "@dotcom-tool-kit/component": "^3.0.0",
+    "@dotcom-tool-kit/eslint": "^3.0.0",
+    "@dotcom-tool-kit/mocha": "^3.0.0",
     "@financial-times/eslint-config-next": "^7.0.0",
     "chai": "^3.3.0",
     "check-engine": "^1.10.1",
-    "dotcom-tool-kit": "^2.4.2",
+    "dotcom-tool-kit": "^3.0.0",
     "eslint": "^8.32.0",
     "lintspaces-cli": "^0.1.1",
     "mocha": "^6.2.3",
