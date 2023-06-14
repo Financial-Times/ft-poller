@@ -9,4 +9,3 @@ hooks:
   test:ci:
     - Eslint
     - Mocha
-

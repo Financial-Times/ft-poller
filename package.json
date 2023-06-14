@@ -17,13 +17,13 @@
     "n-eager-fetch": "^7.0.0"
   },
   "devDependencies": {
-    "@dotcom-tool-kit/component": "^2.1.1",
-    "@dotcom-tool-kit/eslint": "^2.2.5",
-    "@dotcom-tool-kit/mocha": "^2.2.1",
+    "@dotcom-tool-kit/component": "^3.1.7",
+    "@dotcom-tool-kit/eslint": "^3.1.2",
+    "@dotcom-tool-kit/mocha": "^3.1.2",
     "@financial-times/eslint-config-next": "^7.0.0",
     "chai": "^3.3.0",
     "check-engine": "^1.10.1",
-    "dotcom-tool-kit": "^2.4.2",
+    "dotcom-tool-kit": "^3.2.0",
     "eslint": "^8.32.0",
     "lintspaces-cli": "^0.1.1",
     "mocha": "^6.2.3",
@@ -36,14 +36,13 @@
   },
   "scripts": {
     "prepare": "npx snyk protect || npx snyk protect -d || true",
-    "preinstall": "[ \"$INIT_CWD\" != \"$PWD\" ] || npm_config_yes=true npx check-engine",
     "build": "dotcom-tool-kit build:local",
     "test": "dotcom-tool-kit test:local",
     "start": "dotcom-tool-kit run:local"
   },
   "engines": {
-    "node": "16.x",
-    "npm": "7.x || 8.x"
+    "node": "16.x || 18.x",
+    "npm": "7.x || 8.x || 9.x"
   },
   "husky": {
     "hooks": {
@@ -53,7 +52,6 @@
     }
   },
   "volta": {
-    "node": "16.14.1",
-    "npm": "7.20.2"
+    "node": "18.16.0"
   }
 }
