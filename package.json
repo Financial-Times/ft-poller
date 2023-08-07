@@ -12,7 +12,7 @@
     "lib": "./lib"
   },
   "dependencies": {
-    "@financial-times/n-logger": "^10.3.0",
+    "@dotcom-reliability-kit/logger": "^2.2.7",
     "isomorphic-fetch": "^3.0.0",
     "n-eager-fetch": "^7.0.0"
   },
