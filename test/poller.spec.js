@@ -16,7 +16,7 @@ const mockLogger = {
 	error: sinon.stub(),
 	warn: sinon.stub()
 };
-mockery.registerMock ('@financial-times/n-logger', { default: mockLogger });
+mockery.registerMock ('@dotcom-reliability-kit/logger', mockLogger);
 
 const Poller = require ('../src/server');
 

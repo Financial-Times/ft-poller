@@ -1,6 +1,6 @@
 'use strict';
 const errors = require('./errors');
-const logger = require('@financial-times/n-logger').default;
+const logger = require('@dotcom-reliability-kit/logger');
 
 require ('isomorphic-fetch');
 
