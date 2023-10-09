@@ -17,7 +17,7 @@
     "n-eager-fetch": "^7.0.0"
   },
   "devDependencies": {
-    "@dotcom-tool-kit/component": "^3.1.7",
+    "@dotcom-tool-kit/component": "^4.0.0",
     "@dotcom-tool-kit/eslint": "^3.1.2",
     "@dotcom-tool-kit/mocha": "^3.1.2",
     "@financial-times/eslint-config-next": "^7.0.0",
