@@ -23,7 +23,7 @@ const Poller = require ('../src/server');
 describe ('Poller', function () {
 
 	it ('Should exist', function () {
-		expect (new Poller( { url: '/' } )).to.be.defined;
+		expect (new Poller( { url: '/' } )).not.to.be.undefined;
 	});
 
 	it ('Should start a job', function () {
@@ -260,7 +260,7 @@ describe ('Poller', function () {
 	});
 
 	it ('Should be possible to retry requests', function () {
-		sinon.stub (Poller.prototype, 'eagerFetch', function () {
+		sinon.stub (Poller.prototype, 'eagerFetch').callsFake(function () {
 			return Promise.reject (new Error ('network timeout at 12345'));
 		});
 		const p = new Poller({
