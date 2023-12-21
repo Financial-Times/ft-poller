@@ -17,6 +17,7 @@
     "n-eager-fetch": "^7.1.1"
   },
   "devDependencies": {
+    "@dotcom-reliability-kit/eslint-config": "^2.0.1",
     "@dotcom-tool-kit/component": "^3.1.7",
     "@dotcom-tool-kit/eslint": "^3.1.2",
     "@dotcom-tool-kit/mocha": "^3.1.2",
@@ -24,7 +25,7 @@
     "chai": "^3.3.0",
     "check-engine": "^1.10.1",
     "dotcom-tool-kit": "^3.2.0",
-    "eslint": "^8.32.0",
+    "eslint": "^8.56.0",
     "lintspaces-cli": "^0.1.1",
     "mocha": "^6.2.3",
     "mockery": "^2.1.0",
