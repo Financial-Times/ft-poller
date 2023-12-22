@@ -1,10 +1,9 @@
 /* global it, describe */
 
+const assert = require('node:assert/strict');
 const mockery = require ('mockery');
-const chai = require ('chai');
 const sinon = require ('sinon');
 const nock = require ('nock');
-const expect = chai.expect;
 const HttpError = require('../src/errors').HttpError;
 
 mockery.enable ({
@@ -23,22 +22,22 @@ const Poller = require ('../src/server');
 describe ('Poller', function () {
 
 	it ('Should exist', function () {
-		expect (new Poller( { url: '/' } )).to.be.defined;
+		assert.notEqual (new Poller( { url: '/' } ), undefined);
 	});
 
 	it ('Should start a job', function () {
 		const poller = new Poller( { url: '/' } );
 		poller.start ();
-		expect (poller.isRunning ()).to.equal (true);
+		assert.equal (poller.isRunning (), true);
 		poller.stop ();
 	});
 
 	it ('Should avoid starting a job twice', function () {
 		const poller = new Poller( { url: '/' } );
 		poller.start ();
-		expect (function () {
+		assert.throws (function () {
 			poller.start ();
-		}).to.throw ('Could not start job because the service is already running');
+		}, /Could not start job because the service is already running/i);
 		poller.stop ();
 	});
 
@@ -46,7 +45,7 @@ describe ('Poller', function () {
 		const poller = new Poller( { url: '/' } );
 		poller.start ();
 		poller.stop ();
-		expect (poller.isRunning ()).to.equal (false);
+		assert.equal (poller.isRunning (), false);
 	});
 
 	it ('Regression test: Should pass a JSON object to the given callback when the Content-Type contains but does not equal application/json (e.g. bertha)', function (done) {
@@ -58,8 +57,8 @@ describe ('Poller', function () {
 		const p = new Poller( {
 			url: 'http://example.com/json-charset',
 			parseData: function (res) {
-				expect (ft.isDone ()).to.be.true; // ensure Nock has been used
-				expect (res.foo).to.equal (1);
+				assert.equal (ft.isDone (), true); // ensure Nock has been used
+				assert.equal (res.foo, 1);
 				done ();
 			}
 		});
@@ -76,8 +75,8 @@ describe ('Poller', function () {
 		const p = new Poller( {
 			url: 'http://example.com/json',
 			parseData: function (res) {
-				expect (ft.isDone ()).to.be.true; // ensure Nock has been used
-				expect (res.foo).to.equal (1);
+				assert.equal (ft.isDone (), true); // ensure Nock has been used
+				assert.equal (res.foo, 1);
 				done ();
 			}
 		});
@@ -94,8 +93,8 @@ describe ('Poller', function () {
 		const p = new Poller( {
 			url: 'http://example.com',
 			parseData: function (res) {
-				expect (ft.isDone ()).to.be.true; // ensure Nock has been used
-				expect (res).to.equal ('hello world');
+				assert.equal (ft.isDone (), true); // ensure Nock has been used
+				assert.equal (res, 'hello world');
 				done ();
 			}
 		});
@@ -115,8 +114,8 @@ describe ('Poller', function () {
 			url: 'http://example.com',
 			refreshInterval: 5000,
 			parseData: function (res) {
-				expect (res.foo).to.equal (1);
-				expect (ft.isDone ()).to.be.true; // ensure Nock has been used
+				assert.equal (res.foo, 1);
+				assert.equal (ft.isDone (), true); // ensure Nock has been used
 				done ();
 			}
 		});
@@ -131,7 +130,7 @@ describe ('Poller', function () {
 		const poller = new Poller( { url: '/' } );
 		const spy = sinon.spy (poller, 'fetch');
 		poller.start ({ initialRequest: true });
-		expect (spy.callCount).to.equal (1);
+		assert.equal (spy.callCount, 1);
 		poller.stop ();
 	});
 
@@ -142,10 +141,10 @@ describe ('Poller', function () {
 		const eventEmitterStub = sinon.stub (poller, 'emit');
 
 		poller.start ({ initialRequest: true }).then (function () {
-			expect (eventEmitterStub.calledOnce).to.be.true;
+			assert.equal (eventEmitterStub.calledOnce, true);
 			done ();
 		});
-		expect (spy.callCount).to.equal (1);
+		assert.equal (spy.callCount, 1);
 		poller.stop ();
 	});
 
@@ -156,10 +155,10 @@ describe ('Poller', function () {
 		const eventEmitterStub = sinon.stub (poller, 'emit');
 
 		poller.start ().then (function () {
-			expect (eventEmitterStub.calledOnce).to.be.false;
+			assert.equal (eventEmitterStub.calledOnce, false);
 			done ();
 		});
-		expect (spy.callCount).to.equal (0);
+		assert.equal (spy.callCount, 0);
 		poller.stop ();
 	});
 
@@ -177,10 +176,10 @@ describe ('Poller', function () {
 		p.fetch ();
 
 		setTimeout (function () {
-			expect (ft.isDone ()).to.be.true; // ensure Nock has been used
-			expect (eventEmitterStub.calledOnce).to.be.true;
-			expect (eventEmitterStub.getCall (0).args[0]).to.equal ('error');
-			expect(eventEmitterStub.getCall (0).args[1]).to.be.an.instanceOf(HttpError);
+			assert.equal (ft.isDone (), true); // ensure Nock has been used
+			assert.equal (eventEmitterStub.calledOnce, true);
+			assert.equal (eventEmitterStub.getCall (0).args[0], 'error');
+			assert.ok (eventEmitterStub.getCall (0).args[1] instanceof HttpError);
 			done ();
 		}, 10);
 
@@ -203,11 +202,11 @@ describe ('Poller', function () {
 		const eventEmitterStub = sinon.stub (p, 'emit');
 
 		setTimeout (function () {
-			expect (p.getData()).to.deep.equal(defaultData);
-			expect (ft.isDone()).to.be.true; // ensure Nock has been used
-			expect (eventEmitterStub.calledOnce).to.be.true;
-			expect (eventEmitterStub.getCall (0).args[0]).to.equal ('error');
-			expect(eventEmitterStub.getCall (0).args[1]).to.be.an.instanceOf(HttpError);
+			assert.deepEqual (p.getData(), defaultData);
+			assert.equal (ft.isDone(), true); // ensure Nock has been used
+			assert.equal (eventEmitterStub.calledOnce, true);
+			assert.equal (eventEmitterStub.getCall (0).args[0], 'error');
+			assert.ok (eventEmitterStub.getCall (0).args[1] instanceof HttpError);
 			done ();
 		}, 10);
 		p.stop ();
@@ -225,10 +224,10 @@ describe ('Poller', function () {
 		p.fetch ();
 
 		setTimeout (function () {
-			expect (ft.isDone ()).to.be.true; // ensure Nock has been used
-			expect (eventEmitterStub.called).to.be.true;
-			expect (eventEmitterStub.getCall (0).args[0]).to.equal ('ok');
-			expect (eventEmitterStub.getCall (0).args[2]).to.match (/^\d+$/);
+			assert.equal (ft.isDone (), true); // ensure Nock has been used
+			assert.equal (eventEmitterStub.called, true);
+			assert.equal (eventEmitterStub.getCall (0).args[0], 'ok');
+			assert.equal (typeof eventEmitterStub.getCall (0).args[2], 'number');
 			done ();
 		}, 10);
 	});
@@ -251,16 +250,16 @@ describe ('Poller', function () {
 		p.fetch ();
 
 		setTimeout (function () {
-			expect (ft.isDone ()).to.be.true; // ensure Nock has been used
-			expect (eventEmitterStub.called).to.be.true;
-			expect (eventEmitterStub.getCall (0).args[0]).to.equal ('ok');
-			expect (eventEmitterStub.getCall (0).args[2]).to.match (/^\d+$/);
+			assert.equal (ft.isDone (), true); // ensure Nock has been used
+			assert.equal (eventEmitterStub.called, true);
+			assert.equal (eventEmitterStub.getCall (0).args[0], 'ok');
+			assert.equal (typeof eventEmitterStub.getCall (0).args[2], 'number');
 			done ();
 		}, 10);
 	});
 
 	it ('Should be possible to retry requests', function () {
-		sinon.stub (Poller.prototype, 'eagerFetch', function () {
+		sinon.stub (Poller.prototype, 'eagerFetch').callsFake(function () {
 			return Promise.reject (new Error ('network timeout at 12345'));
 		});
 		const p = new Poller({
@@ -274,7 +273,7 @@ describe ('Poller', function () {
 
 
 		p.fetch ();
-		expect (p.eagerFetch.calledOnce).to.be.true;
+		assert.equal (p.eagerFetch.calledOnce, true);
 		Poller.prototype.eagerFetch.restore ();
 
 	});
@@ -293,11 +292,11 @@ describe ('Poller', function () {
 			}
 		});
 
-		expect (p.getData ()).to.equal (0);
+		assert.equal (p.getData (), 0);
 
 		p.fetch ();
 		setTimeout (function () {
-			expect (p.getData ()).to.equal (1);
+			assert.equal (p.getData (), 1);
 			done ();
 		}, 10);
 	});
@@ -315,7 +314,7 @@ describe ('Poller', function () {
 
 		p.fetch ();
 		setTimeout (function () {
-			expect (p.getData ()).to.deep.equal ({foo: 1});
+			assert.deepEqual (p.getData (), {foo: 1});
 			done ();
 		}, 10);
 	});
@@ -334,7 +333,7 @@ describe ('Poller', function () {
 
 		p.fetch ();
 		setTimeout (function () {
-			expect (p.getData ()).to.deep.equal ({bar: 2});
+			assert.deepEqual (p.getData (), {bar: 2});
 			done ();
 		}, 10);
 	});
@@ -353,8 +352,8 @@ describe ('Poller', function () {
 			autostart: true
 		});
 
-		expect (p.start.calledOnce).to.be.true;
-		expect (p.start.args[0][0]).to.deep.equal ({initialRequest: true});
+		assert.equal (p.start.calledOnce, true);
+		assert.deepEqual (p.start.args[0][0], {initialRequest: true});
 		stub.restore ();
 		p.stop ();
 	});
@@ -372,7 +371,7 @@ describe ('Poller', function () {
 
 		p.start ({initialRequest:true});
 		p.once ('data', data => {
-			expect (data).to.deep.equal (stub);
+			assert.deepEqual (data, stub);
 			done ();
 		});
 		p.stop ();
@@ -391,7 +390,7 @@ describe ('Poller', function () {
 
 		const onSecond = data => {
 			try{
-				expect (data).to.deep.equal (stub1);
+				assert.deepEqual (data, stub1);
 				done ();
 			}catch (e) {
 				done (e);
@@ -423,11 +422,11 @@ describe ('Poller', function () {
 		});
 
 		it('should have a state of "initial"', () => {
-			expect(poller.state).to.equal('initial');
+			assert.equal(poller.state, 'initial');
 		});
 
 		it('should have default data', () => {
-			expect(poller.getData()).to.deep.equal({ isDefaultData: true });
+			assert.deepEqual(poller.getData(), { isDefaultData: true });
 		});
 
 		describe('when the first fetch resolves', () => {
@@ -441,16 +440,16 @@ describe ('Poller', function () {
 			});
 
 			it('should have a state of "fresh"', () => {
-				expect(poller.state).to.equal('fresh');
+				assert.equal(poller.state, 'fresh');
 			});
 
 			it('should have fresh data', () => {
-				expect(poller.getData()).to.deep.equal({ isOriginalData: true });
+				assert.deepEqual(poller.getData(), { isOriginalData: true });
 			});
 
 			it('should not log errors or warnings', () => {
-				expect(mockLogger.error.callCount).to.equal(0);
-				expect(mockLogger.warn.callCount).to.equal(0);
+				assert.equal(mockLogger.error.callCount, 0);
+				assert.equal(mockLogger.warn.callCount, 0);
 			});
 
 			describe('when the second fetch rejects', () => {
@@ -464,19 +463,19 @@ describe ('Poller', function () {
 				});
 
 				it('should have a state of "stale"', () => {
-					expect(poller.state).to.equal('stale');
+					assert.equal(poller.state, 'stale');
 				});
 
 				it('should have stale data', () => {
-					expect(poller.getData()).to.deep.equal({ isOriginalData: true });
+					assert.deepEqual(poller.getData(), { isOriginalData: true });
 				});
 
 				it('should log a warning message', () => {
-					expect(mockLogger.warn.callCount).to.equal(1);
+					assert.equal(mockLogger.warn.callCount, 1);
 					const args = mockLogger.warn.getCall(0).args;
-					expect(args[0]).to.equal('Poller is serving stale data. It was unable to fetch fresh data');
-					expect(args[1]).to.deep.equal({ event: 'POLLER_DATA_STALE' });
-					expect(args[2]).to.be.instanceOf(HttpError);
+					assert.equal(args[0], 'Poller is serving stale data. It was unable to fetch fresh data');
+					assert.deepEqual(args[1], { event: 'POLLER_DATA_STALE' });
+					assert.ok (args[2] instanceof HttpError);
 				});
 
 			});
@@ -494,19 +493,19 @@ describe ('Poller', function () {
 			});
 
 			it('should have a state of "erroring"', () => {
-				expect(poller.state).to.equal('erroring');
+				assert.equal(poller.state, 'erroring');
 			});
 
 			it('should have default data', () => {
-				expect(poller.getData()).to.deep.equal({ isDefaultData: true });
+				assert.deepEqual(poller.getData(), { isDefaultData: true });
 			});
 
 			it('should log an error message', () => {
-				expect(mockLogger.error.callCount).to.equal(1);
+				assert.equal(mockLogger.error.callCount, 1);
 				const args = mockLogger.error.getCall(0).args;
-				expect(args[0]).to.equal('Poller is serving default data. It was unable to fetch fresh data');
-				expect(args[1]).to.deep.equal({ event: 'POLLER_DATA_DEFAULT' });
-				expect(args[2]).to.be.instanceOf(HttpError);
+				assert.equal(args[0], 'Poller is serving default data. It was unable to fetch fresh data');
+				assert.deepEqual(args[1], { event: 'POLLER_DATA_DEFAULT' });
+				assert.ok (args[2] instanceof HttpError);
 			});
 
 		});
