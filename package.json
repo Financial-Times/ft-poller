@@ -14,7 +14,7 @@
   "dependencies": {
     "@dotcom-reliability-kit/logger": "^2.4.2",
     "isomorphic-fetch": "^3.0.0",
-    "n-eager-fetch": "^7.1.1"
+    "n-eager-fetch": "^7.2.0"
   },
   "devDependencies": {
     "@dotcom-reliability-kit/eslint-config": "^2.0.1",
@@ -39,8 +39,8 @@
     "start": "dotcom-tool-kit run:local"
   },
   "engines": {
-    "node": "16.x || 18.x",
-    "npm": "7.x || 8.x || 9.x"
+    "node": "16.x || 18.x || 20.x",
+    "npm": "7.x || 8.x || 9.x || 10.x"
   },
   "husky": {
     "hooks": {
@@ -50,6 +50,6 @@
     }
   },
   "volta": {
-    "node": "18.16.0"
+    "node": "20.11.0"
   }
 }
