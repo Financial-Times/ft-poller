@@ -29,11 +29,9 @@
     "mocha": "^10.2.0",
     "mockery": "^2.1.0",
     "nock": "^13.4.0",
-    "sinon": "^16.1.3",
-    "snyk": "^1.1266.0"
+    "sinon": "^16.1.3"
   },
   "scripts": {
-    "prepare": "npx snyk protect || npx snyk protect -d || true",
     "build": "dotcom-tool-kit build:local",
     "test": "dotcom-tool-kit test:local",
     "start": "dotcom-tool-kit run:local"
