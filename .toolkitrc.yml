@@ -12,6 +12,5 @@ hooks:
 options:
   '@dotcom-tool-kit/circleci':
     nodeVersion:
-      - '20.11'
-      - '18.19'
-      - '16.20'
+      - '20.15'
+      - '18.20'
