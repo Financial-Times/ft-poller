@@ -87,7 +87,14 @@ module.exports = EventEmitter => {
 			// later is discarded within pollers
 			const _fetch = this.options.retry ? this.eagerFetch : fetch;
 
-			return _fetch (this.url, this.options)
+			const options = {...this.options}
+			if (options.timeout) {
+				// add signal option to support native fetch, but keep timeout option
+				// too to support node-fetch@<2.3.0
+				options.signal = AbortSignal.timeout(options.timeout)
+			}
+
+			return _fetch (this.url, options)
 				.then ((response) => {
 					const latency = new Date () - time;
 					if (response.ok) {
