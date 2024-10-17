@@ -88,7 +88,11 @@ module.exports = EventEmitter => {
 			const _fetch = this.options.retry ? this.eagerFetch : fetch;
 
 			const options = {...this.options}
-			if (options.timeout) {
+			// FIXME: This is hideous, but we need to check whether AbortSignal.timeout is a function here.
+			// This is because lots of our apps use Jest + JSDom for testing which still doesn't have
+			// AbortSignal.timeout defined. There are plenty of places where poller isn't mocked in our
+			// tests and so I don't think we can avoid this check for now
+			if (options.timeout && AbortSignal.timeout) {
 				// add signal option to support native fetch, but keep timeout option
 				// too to support node-fetch@<2.3.0
 				options.signal = AbortSignal.timeout(options.timeout)
