@@ -23,7 +23,7 @@
     "@dotcom-tool-kit/mocha": "^3.1.6",
     "@financial-times/eslint-config-next": "^7.0.0",
     "check-engine": "^1.12.0",
-    "dotcom-tool-kit": "^3.3.11",
+    "dotcom-tool-kit": "^4.4.0",
     "eslint": "^8.56.0",
     "lintspaces-cli": "^1.0.0",
     "mocha": "^10.2.0",
