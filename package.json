@@ -37,8 +37,7 @@
     "start": "dotcom-tool-kit run:local"
   },
   "engines": {
-    "node": "18.x || 20.x",
-    "npm": "7.x || 8.x || 9.x || 10.x"
+    "node": "18.x || 20.x || 22.x"
   },
   "husky": {
     "hooks": {
@@ -48,6 +47,6 @@
     }
   },
   "volta": {
-    "node": "20.11.0"
+    "node": "22.14.0"
   }
 }
