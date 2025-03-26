@@ -27,7 +27,7 @@
     "mocha": "^11.1.0",
     "mockery": "^2.1.0",
     "nock": "^13.5.6",
-    "sinon": "^19.0.2"
+    "sinon": "^20.0.0"
   },
   "scripts": {
     "build": "dotcom-tool-kit build:local",
