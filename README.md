@@ -19,7 +19,7 @@ Where `config` is an object with the following properties
 
 * `url` [required]: Url to fetch data from
 * `defaultData` [recommended]: Data to return if the poller is yet to make a successful request. Typically this will be an empty object of the same type/structure as a successful response e.g. if a successful response would give you an array of users then set `defaultData: []`
-* `options` [optional]: options object to pass to isomorphic-fetch. If options is not defined or doesn't contain a `timeout` property, request timeout will be set to 4000ms by default. If `retry` is specified then n-eager-fetch is used to send the request instead of fetch
+* `options` [optional]: options object to pass to `fetch`. If options is not defined or doesn't contain a `signal` property, the request timeout will be set to 4000ms by default. If `retry` is specified then the fetch will be retried the given number of times before erroring
 * `refreshInterval` [default: 60000]: Number of milliseconds to wait between request for data
 * `autostart` [default: false]: Whether to start the poller automatically when the instance is created
 * `parseData` [optional]: function to post-process the data returned by the request. Should return the post-processed data e.g

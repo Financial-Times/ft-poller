@@ -1,9 +1,9 @@
-/* global it, describe */
+/* global afterEach, beforeEach, it, describe */
 
 const assert = require('node:assert/strict');
 const mockery = require ('mockery');
 const sinon = require ('sinon');
-const nock = require ('nock');
+const { MockAgent, setGlobalDispatcher } = require('undici');
 const HttpError = require('../src/errors').HttpError;
 
 mockery.enable ({
@@ -20,6 +20,18 @@ mockery.registerMock ('@dotcom-reliability-kit/logger', mockLogger);
 const Poller = require ('../src/server');
 
 describe ('Poller', function () {
+	/** @type {import('undici').MockAgent} */
+	let mockAgent;
+
+	beforeEach(function () {
+		mockAgent = new MockAgent();
+		mockAgent.disableNetConnect();
+		setGlobalDispatcher(mockAgent);
+	});
+
+	afterEach(async () => {
+		await mockAgent.close();
+	});
 
 	it ('Should exist', function () {
 		assert.notEqual (new Poller( { url: '/' } ), undefined);
@@ -50,14 +62,13 @@ describe ('Poller', function () {
 
 	it ('Regression test: Should pass a JSON object to the given callback when the Content-Type contains but does not equal application/json (e.g. bertha)', function (done) {
 
-		const ft = nock ('http://example.com')
-			.get ('/json-charset')
-			.reply (200, { 'foo': 1 }, { 'Content-Type': 'application/json; charset=utf-8' });
+		mockAgent.get('http://example.com')
+			.intercept({ path: '/json-charset' })
+			.reply(200, { foo: 1 }, { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 
 		const p = new Poller( {
 			url: 'http://example.com/json-charset',
 			parseData: function (res) {
-				assert.equal (ft.isDone (), true); // ensure Nock has been used
 				assert.equal (res.foo, 1);
 				done ();
 			}
@@ -68,14 +79,13 @@ describe ('Poller', function () {
 
 	it ('Should pass a JSON object to the given callback', function (done) {
 
-		const ft = nock ('http://example.com')
-			.get ('/json')
-			.reply (200, { 'foo': 1 });
+		mockAgent.get('http://example.com')
+			.intercept({ path: '/json' })
+			.reply(200, { foo: 1 }, { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 
 		const p = new Poller( {
 			url: 'http://example.com/json',
 			parseData: function (res) {
-				assert.equal (ft.isDone (), true); // ensure Nock has been used
 				assert.equal (res.foo, 1);
 				done ();
 			}
@@ -86,14 +96,13 @@ describe ('Poller', function () {
 
 	it ('Should pass a text object to the given callback', function (done) {
 
-		const ft = nock ('http://example.com')
-			.get ('/')
-			.reply (200, 'hello world');
+		mockAgent.get('http://example.com')
+			.intercept({ path: '/' })
+			.reply(200, 'hello world', { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 
 		const p = new Poller( {
 			url: 'http://example.com',
 			parseData: function (res) {
-				assert.equal (ft.isDone (), true); // ensure Nock has been used
 				assert.equal (res, 'hello world');
 				done ();
 			}
@@ -104,9 +113,9 @@ describe ('Poller', function () {
 
 	it ('Should check the poller interval runs correctly', function (done) {
 
-		const ft = nock ('http://example.com')
-			.get ('/')
-			.reply (200, { 'foo': 1 });
+		mockAgent.get('http://example.com')
+			.intercept({ path: '/' })
+			.reply(200, { foo: 1 }, { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 
 		const clock = sinon.useFakeTimers ();
 
@@ -115,7 +124,6 @@ describe ('Poller', function () {
 			refreshInterval: 5000,
 			parseData: function (res) {
 				assert.equal (res.foo, 1);
-				assert.equal (ft.isDone (), true); // ensure Nock has been used
 				done ();
 			}
 		});
@@ -164,9 +172,9 @@ describe ('Poller', function () {
 
 	it ('Should fire an event when a error is received from the server', function (done) {
 
-		const ft = nock ('http://example.com')
-			.get ('/')
-			.reply (503, {});
+		mockAgent.get('http://example.com')
+			.intercept({ path: '/' })
+			.reply(503, {}, { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 
 		const p = new Poller({
 			url: 'http://example.com'
@@ -176,7 +184,6 @@ describe ('Poller', function () {
 		p.fetch ();
 
 		setTimeout (function () {
-			assert.equal (ft.isDone (), true); // ensure Nock has been used
 			assert.equal (eventEmitterStub.calledOnce, true);
 			assert.equal (eventEmitterStub.getCall (0).args[0], 'error');
 			assert.ok (eventEmitterStub.getCall (0).args[1] instanceof HttpError);
@@ -187,9 +194,9 @@ describe ('Poller', function () {
 
 	it ('Should return defaultData if the server errors after the poller autostarts without listening for errors', function (done) {
 
-		const ft = nock ('http://example.com')
-			.get ('/')
-			.reply (503, {});
+		mockAgent.get('http://example.com')
+			.intercept({ path: '/' })
+			.reply(503, {}, { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 
 		const defaultData = [1, 2, 3];
 
@@ -203,7 +210,6 @@ describe ('Poller', function () {
 
 		setTimeout (function () {
 			assert.deepEqual (p.getData(), defaultData);
-			assert.equal (ft.isDone(), true); // ensure Nock has been used
 			assert.equal (eventEmitterStub.calledOnce, true);
 			assert.equal (eventEmitterStub.getCall (0).args[0], 'error');
 			assert.ok (eventEmitterStub.getCall (0).args[1] instanceof HttpError);
@@ -214,9 +220,9 @@ describe ('Poller', function () {
 
 	it ('Should annotate the polling response with latency information', function (done) {
 
-		const ft = nock ('http://example.com')
-			.get ('/1')
-			.reply (200, { 'foo': 1 });
+		mockAgent.get('http://example.com')
+			.intercept({ path: '/1' })
+			.reply(200, { foo: 1 }, { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 
 		const p = new Poller( { url: 'http://example.com/1', parseData: function () {} } );
 
@@ -224,7 +230,6 @@ describe ('Poller', function () {
 		p.fetch ();
 
 		setTimeout (function () {
-			assert.equal (ft.isDone (), true); // ensure Nock has been used
 			assert.equal (eventEmitterStub.called, true);
 			assert.equal (eventEmitterStub.getCall (0).args[0], 'ok');
 			assert.equal (typeof eventEmitterStub.getCall (0).args[2], 'number');
@@ -234,9 +239,9 @@ describe ('Poller', function () {
 
 	it ('Should handle POST requests', function (done) {
 
-		const ft = nock ('http://example.com')
-			.post ('/1')
-			.reply (200, { 'foo': 1 });
+		mockAgent.get('http://example.com')
+			.intercept({ path: '/1', method: 'POST' })
+			.reply(200, { foo: 1 }, { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 
 		const p = new Poller({
 			url: 'http://example.com/1',
@@ -250,7 +255,6 @@ describe ('Poller', function () {
 		p.fetch ();
 
 		setTimeout (function () {
-			assert.equal (ft.isDone (), true); // ensure Nock has been used
 			assert.equal (eventEmitterStub.called, true);
 			assert.equal (eventEmitterStub.getCall (0).args[0], 'ok');
 			assert.equal (typeof eventEmitterStub.getCall (0).args[2], 'number');
@@ -280,9 +284,9 @@ describe ('Poller', function () {
 
 	it ('Should be possible to act as data container', function (done) {
 
-		nock ('http://example.com')
-			.get ('/json')
-			.reply (200, { 'foo': 1 });
+		mockAgent.get('http://example.com')
+			.intercept({ path: '/json' })
+			.reply(200, { foo: 1 }, { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 
 		const p = new Poller( {
 			url: 'http://example.com/json',
@@ -303,9 +307,9 @@ describe ('Poller', function () {
 
 	it ('Should define a default data parser', function (done) {
 
-		nock ('http://example.com')
-			.get ('/json')
-			.reply (200, { 'foo': 1 });
+		mockAgent.get('http://example.com')
+			.intercept({ path: '/json' })
+			.reply(200, { foo: 1 }, { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 
 		const p = new Poller( {
 			url: 'http://example.com/json',
@@ -321,9 +325,9 @@ describe ('Poller', function () {
 
 	it ('Should allow async data parser', function (done) {
 
-		nock ('http://example.com')
-			.get ('/json')
-			.reply (200, { 'foo': 1 });
+		mockAgent.get('http://example.com')
+			.intercept({ path: '/json' })
+			.reply(200, { foo: 1 }, { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 
 		const p = new Poller( {
 			url: 'http://example.com/json',
@@ -340,9 +344,9 @@ describe ('Poller', function () {
 
 	it ('Should be possible to autostart', function () {
 
-		nock ('http://example.com')
-			.get ('/json')
-			.reply (200, { 'foo': 1 });
+		mockAgent.get('http://example.com')
+			.intercept({ path: '/json' })
+			.reply(200, { foo: 1 }, { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 
 		const stub = sinon.stub (Poller.prototype, 'start');
 
@@ -359,10 +363,10 @@ describe ('Poller', function () {
 	});
 
 	it ('Should fire a "data" event when new data is received and parsed', (done) => {
-		const stub = { 'foo': 1 };
-		nock ('http://example.com')
-			.get ('/json')
-			.reply (200, stub);
+		const stub = { foo: 1 };
+		mockAgent.get('http://example.com')
+			.intercept({ path: '/json' })
+			.reply(200, stub, { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 
 		const p = new Poller( {
 			url: 'http://example.com/json',
@@ -378,10 +382,11 @@ describe ('Poller', function () {
 	});
 
 	it ('Should have the ability to manually retry', done => {
-		const stub1 = { 'foo': 1 };
-		nock ('http://example.com')
-			.get ('/json')
-			.reply (200, stub1);
+		const stub1 = { foo: 1 };
+		mockAgent.get('http://example.com')
+			.intercept({ path: '/json' })
+			.reply(200, stub1, { headers: { 'Content-Type': 'application/json; charset=utf-8' } })
+			.times(2);
 
 		const p = new Poller( {
 			url: 'http://example.com/json',
@@ -432,10 +437,9 @@ describe ('Poller', function () {
 		describe('when the first fetch resolves', () => {
 
 			beforeEach(async () => {
-				nock('http://example.com')
-					.get('/states')
-					.once()
-					.reply(200, { isOriginalData: true });
+				mockAgent.get('http://example.com')
+					.intercept({ path: '/states' })
+					.reply(200, { isOriginalData: true }, { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 				await poller.fetch();
 			});
 
@@ -455,10 +459,9 @@ describe ('Poller', function () {
 			describe('when the second fetch rejects', () => {
 
 				beforeEach(async () => {
-					nock('http://example.com')
-						.get('/states')
-						.once()
-						.reply(500, { isDataFromError: true });
+					mockAgent.get('http://example.com')
+						.intercept({ path: '/states' })
+						.reply(500, { isDataFromError: true }, { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 					await poller.fetch();
 				});
 
@@ -485,10 +488,9 @@ describe ('Poller', function () {
 		describe('when the first fetch rejects', () => {
 
 			beforeEach(async () => {
-				nock('http://example.com')
-					.get('/states')
-					.once()
-					.reply(500, { isDataFromError: true });
+				mockAgent.get('http://example.com')
+					.intercept({ path: '/states' })
+					.reply(500, { isDataFromError: true }, { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 				await poller.fetch();
 			});
 
