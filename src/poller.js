@@ -1,8 +1,7 @@
 'use strict';
 const errors = require('./errors');
 const logger = require('@dotcom-reliability-kit/logger');
-
-require ('isomorphic-fetch');
+const { fetch } = require('undici');
 
 module.exports = EventEmitter => {
 
@@ -15,10 +14,19 @@ module.exports = EventEmitter => {
 			}
 
 			this.url = config.url;
-			this.options = config.options || {};
+			this.options = Object.assign({}, config.options || {});
 			this.data = config.defaultData;
 			this.state = Poller.states.INITIAL;
-			this.options.timeout = this.options.timeout || 4000;
+
+			// HACK:20250430:RM: We check whether AbortSignal.timeout exists here as many
+			// of our apps use Jest + JSDom for testing which _still_ doesn't have
+			// AbortSignal.timeout defined. There are plenty of places where ft-poller
+			// isn't mocked in our tests. This means tests won't time out but it
+			// shouldn't really matter in that context.
+			if (AbortSignal.timeout && !this.options.signal) {
+				this.options.signal = AbortSignal.timeout(this.options.timeout || 4000);
+			}
+			delete this.options.timeout;
 
 			this.options.headers = this.options.headers || {};
 
@@ -86,17 +94,7 @@ module.exports = EventEmitter => {
 			// Note - don't do this in the constructor as it means any instrumentation applied to fetch
 			// later is discarded within pollers
 			const _fetch = this.options.retry ? this.eagerFetch : fetch;
-
-			const options = {...this.options}
-			// FIXME: This is hideous, but we need to check whether AbortSignal.timeout is a function here.
-			// This is because lots of our apps use Jest + JSDom for testing which still doesn't have
-			// AbortSignal.timeout defined. There are plenty of places where poller isn't mocked in our
-			// tests and so I don't think we can avoid this check for now
-			if (options.timeout && AbortSignal.timeout) {
-				// add signal option to support native fetch, but keep timeout option
-				// too to support node-fetch@<2.3.0
-				options.signal = AbortSignal.timeout(options.timeout)
-			}
+			const options = {...this.options};
 
 			return _fetch (this.url, options)
 				.then ((response) => {
