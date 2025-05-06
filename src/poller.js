@@ -18,6 +18,14 @@ module.exports = EventEmitter => {
 			this.data = config.defaultData;
 			this.state = Poller.states.INITIAL;
 
+			if (this.options.timeout) {
+				logger.warn({
+					event: 'POLLER_DEPRECATED_OPTION',
+					message: 'The `timeout` option is deprecated, use the standard `signal` option instead',
+					option: 'timeout'
+				});
+			}
+
 			// HACK:20250430:RM: We check whether AbortSignal.timeout exists here as many
 			// of our apps use Jest + JSDom for testing which _still_ doesn't have
 			// AbortSignal.timeout defined. There are plenty of places where ft-poller
