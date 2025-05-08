@@ -15,4 +15,3 @@ options:
       cimgNodeVersions:
         - '22.14'
         - '20.18'
-        - '18.20'

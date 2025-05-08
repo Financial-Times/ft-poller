@@ -33,7 +33,7 @@
     "start": "dotcom-tool-kit run:local"
   },
   "engines": {
-    "node": "18.x || 20.x || 22.x"
+    "node": "20.x || 22.x"
   },
   "husky": {
     "hooks": {
