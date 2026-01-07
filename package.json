@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@dotcom-reliability-kit/logger": "^4.2.6",
-    "undici": "^7.18.0"
+    "undici": "^7.18.2"
   },
   "devDependencies": {
     "@dotcom-reliability-kit/eslint-config": "^4.1.0",
