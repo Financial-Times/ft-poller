@@ -12,7 +12,7 @@
     "lib": "./lib"
   },
   "dependencies": {
-    "@dotcom-reliability-kit/logger": "^4.2.6",
+    "@dotcom-reliability-kit/logger": "^4.2.7",
     "undici": "^7.18.2"
   },
   "devDependencies": {
