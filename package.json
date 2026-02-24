@@ -22,7 +22,7 @@
     "@dotcom-tool-kit/mocha": "^4.4.6",
     "@financial-times/eslint-config-next": "^7.0.0",
     "dotcom-tool-kit": "^4.10.1",
-    "eslint": "^8.57.1",
+    "eslint": "^10.0.2",
     "mocha": "^11.7.5",
     "mockery": "^2.1.0",
     "sinon": "^21.0.1"
